@@ -5,7 +5,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "user")
-@Getter @Setter @Builder
+@Getter @Builder
 @NoArgsConstructor @AllArgsConstructor
 public class User extends BaseTimeEntity {
 

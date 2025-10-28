@@ -5,7 +5,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "prompt")
-@Getter @Setter @Builder
+@Getter @Builder
 @NoArgsConstructor @AllArgsConstructor
 public class Prompt extends BaseTimeEntity {
 

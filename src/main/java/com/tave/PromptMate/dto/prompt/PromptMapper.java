@@ -24,9 +24,7 @@ public class PromptMapper {
                 p.getCategory() != null ? p.getCategory().getId() : null,
                 p.getTitle(),
                 p.getContent(),
-                p.getIsPrivate(),
-                p.getCreatedAt(),
-                p.getUpdatedAt()
+                p.getIsPrivate()
         );
     }
 }

@@ -5,7 +5,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "rewrite_results")
-@Getter @Setter @Builder
+@Getter @Builder
 @NoArgsConstructor @AllArgsConstructor
 public class RewriteResult extends BaseTimeEntity{
 
