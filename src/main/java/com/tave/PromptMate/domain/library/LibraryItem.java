@@ -8,7 +8,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name="library")
+@Table(name="prompt_library")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -32,10 +32,10 @@ public class LibraryItem {
     private String savedTitle;
 
     @Column(name="created_at", nullable = false, updatable = false)
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 
     @PrePersist
-    void onCreate() { if (createAt==null) createAt=LocalDateTime.now();}
+    void onCreate() { if (createdAt==null) createdAt=LocalDateTime.now();}
 
     public static LibraryItem of(User user, Prompt prompt, String savedTitle){
         return LibraryItem.builder()
