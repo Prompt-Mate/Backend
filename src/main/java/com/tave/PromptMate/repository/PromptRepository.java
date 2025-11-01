@@ -17,6 +17,12 @@ public interface PromptRepository extends JpaRepository<Prompt, Long> {
     // 카테고리별 페이지 조회
     Page<Prompt> findByCategoryId(Long categoryId, Pageable pageable);
 
+    // 카테고리 삭제
+    long countByCategory(com.tave.PromptMate.domain.Category category);
+
+    // 전체 프롬프트 목록 조회
+    List<Prompt> findAllByOrderByCreatedAtDesc();
+
     // 권한 체크 (내가 쓴 프롬프트인가)
     Optional<Prompt> findByIdAndUserId(Long id, Long userId);
 
