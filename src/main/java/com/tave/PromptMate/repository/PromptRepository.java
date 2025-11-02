@@ -27,4 +27,11 @@ public interface PromptRepository extends JpaRepository<Prompt, Long> {
     Optional<Prompt> findByIdAndUserId(Long id, Long userId);
 
     List<Prompt> findAllByCategoryOrderByCreatedAtDesc(Category category);
+
+    Page<Prompt> findByDeletedFalse(Pageable pageable);
+    Page<Prompt> findByUserIdAndDeletedFalse(Long userId, Pageable pageable);
+    Page<Prompt> findByCategoryIdAndDeletedFalse(Long categoryId, Pageable pageable);
+    Page<Prompt> findByDeletedFalseAndTitleContainingIgnoreCaseOrDeletedFalseAndContentContainingIgnoreCase(
+            String titleKeyword, String contentKeyword, Pageable pageable);
+    boolean existsByIdAndDeletedFalse(Long id);
 }

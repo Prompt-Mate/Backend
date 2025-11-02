@@ -46,6 +46,7 @@ public class PromptService {
     public List<PromptResponse> getAll(){
         return promptRepository.findAllByOrderByCreatedAtDesc()
                 .stream()
+                .filter(p -> !p.isDeleted())
                 .map(PromptMapper::toResponse)
                 .toList();
     }
@@ -87,9 +88,10 @@ public class PromptService {
         Prompt prompt = promptRepository.findById(promptId)
                 .orElseThrow(() -> new NotFoundException("prompt not found: " + promptId));
 
+        // 내가 쓴 글이 아니면 삭제 불가
         if (!prompt.getUser().getId().equals(requestUserId)) {
             throw new IllegalStateException("no permission to delete this prompt");
         }
-        promptRepository.delete(prompt);
+        prompt.softDelete();
     }
 }
