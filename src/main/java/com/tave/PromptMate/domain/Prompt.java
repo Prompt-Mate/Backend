@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Table(name = "prompt")
 @Getter @Builder
 @NoArgsConstructor @AllArgsConstructor
-public class Prompt extends BaseTimeEntity {
+public class Prompt {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,6 +34,9 @@ public class Prompt extends BaseTimeEntity {
     @Column(name = "is_private", nullable = false)
     private Boolean isPrivate;
 
+    @Column(nullable = false)
+    private boolean deleted = false;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -50,6 +53,10 @@ public class Prompt extends BaseTimeEntity {
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    public void softDelete() { this.deleted = true; }
+
+    public boolean isDeleted() { return deleted; }
 
 
 }
