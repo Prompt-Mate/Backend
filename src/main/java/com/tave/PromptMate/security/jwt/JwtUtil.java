@@ -109,6 +109,7 @@ public class JwtUtil {
         //권한 정보 추출 & 변환
         String authStr=claims.get("authorities",String.class);
         List<GrantedAuthority> authorities = List.of();
+
         if (authStr  != null && !authStr.isEmpty()) {
             authorities = List.of(authStr.split(","))
                     .stream()
