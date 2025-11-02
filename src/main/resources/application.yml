@@ -5,7 +5,7 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
 
   profiles:
-    include: local
+    include: local, jwt
 
   jpa:
     hibernate:
@@ -17,3 +17,8 @@ spring:
         show_sql: true
         format_sql: true
         use_sql_comments: true
+jwt:
+  expiration:
+    access: ${ACCESS_EXPIRATION:1800000}
+    refresh: ${REFRESH_EXPIRATION:2592000000}
+  secret: ${JWT_SECRET:O0qN1qz7fFvYWq6m1HZjlpajM3U4Yjrcm1DQxq8PjVrNZo+M8c2AtbT/1E84exuGdR8zNQG4Yp2xj0FSLxK+Dw==}
