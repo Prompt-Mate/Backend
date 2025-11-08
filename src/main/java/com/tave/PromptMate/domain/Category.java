@@ -17,4 +17,12 @@ public class Category {
 
     @Column(length = 300)
     private String description;
+
+    public void changeName(String name) {
+        this.name = name;
+    }
+
+    public void changeDescription(String description) {
+        this.description = description;
+    }
 }
