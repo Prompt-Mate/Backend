@@ -1,5 +1,7 @@
 package com.tave.PromptMate.dto.evaluation;
 
+import com.tave.PromptMate.domain.HighlightsPayload;
+
 public record EvaluationResponse(
         Long id,
         Long promptId,
@@ -8,7 +10,10 @@ public record EvaluationResponse(
         Integer specificity,
         Integer context,
         Integer creativity,
+        Integer totalScore,
         String advice,
-        String modelName
+        String modelName,
+        String summary,
+        HighlightsPayload highlights
 ) {
 }

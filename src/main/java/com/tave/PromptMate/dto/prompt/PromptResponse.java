@@ -5,6 +5,5 @@ public record PromptResponse(
         Long userId,
         Long categoryId,
         String title,
-        String content,
-        Boolean isPrivate
+        String content
 ) {}

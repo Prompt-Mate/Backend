@@ -1,6 +1,8 @@
 package com.tave.PromptMate.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,6 +39,21 @@ public class Evaluation extends BaseTimeEntity {
     @Column(nullable = false)
     private String advice;
 
-    @Column(nullable = false)
-    private String model_name;
+    @Column
+    private String version;
+
+    @Column(name = "model_name", nullable = false)
+    private String modelName;
+
+    @Column(name = "total_score", nullable = false)
+    @Min(0) @Max(100)
+    private Integer totalScore;
+
+    @Lob
+    @Column(name = "summary")
+    private String summary;
+
+    @Convert(converter = HighlightsConverter.class)
+    @Column(name = "highlights", columnDefinition = "json")
+    private HighlightsPayload highlights;
 }
