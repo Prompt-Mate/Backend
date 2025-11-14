@@ -1,11 +1,11 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/promptmate
-    username: root
-    password: suji1004!
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
   profiles:
-    include: local, jwt
+    include: local, jwt, oauth
 
   data:
     redis:
