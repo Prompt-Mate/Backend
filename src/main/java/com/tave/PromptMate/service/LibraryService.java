@@ -70,4 +70,13 @@ public class LibraryService {
                 .orElseThrow(() -> new NotFoundException("library not found: " + id));
         libraryRepository.delete(lib);
     }
+
+    //라이브러리 검색
+    public List<LibraryResponse> searchMyLibraries(Long userId, String keyword){
+        return libraryRepository
+                .findByUser_IdAndSavedTitleContainingIgnoreCaseOrderByCreatedAtDesc(userId,keyword)
+                .stream()
+                .map(LibraryMapper::toResponse)
+                .toList();
+    }
 }

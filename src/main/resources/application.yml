@@ -1,11 +1,6 @@
 spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/promptmate
-    username: root
-    password: suji1004!
-
   profiles:
-    include: local
+    active: local
 
   jpa:
     hibernate:

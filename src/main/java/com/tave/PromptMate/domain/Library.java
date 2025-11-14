@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "library")
+@Table(name = "prompt_library")
 public class Library {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
