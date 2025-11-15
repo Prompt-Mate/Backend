@@ -14,6 +14,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor @AllArgsConstructor
 public class Prompt {
 
+    public void changeCategory(Category category) { this.category = category; }
+
+    public void changeTitle(String title) { this.title = title; }
+
+    public void changeContent(String content) { this.content = content; }
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -31,8 +37,6 @@ public class Prompt {
     @Column(nullable = false)
     private String content;
 
-    @Column(name = "is_private", nullable = false)
-    private Boolean isPrivate;
 
     @Column(nullable = false)
     private boolean deleted = false;

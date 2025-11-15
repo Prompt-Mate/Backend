@@ -15,8 +15,11 @@ public final class EvaluationMapper {
                 .specificity(req.specificity())
                 .context(req.context())
                 .creativity(req.creativity())
+                .totalScore(req.totalScore())
                 .advice(req.advice())
-                .model_name(req.modelName())
+                .modelName(req.modelName())
+                .summary(req.summary())
+                .highlights(req.highlights())
                 .build();
     }
 
@@ -29,8 +32,11 @@ public final class EvaluationMapper {
                 e.getSpecificity(),
                 e.getContext(),
                 e.getCreativity(),
+                e.getTotalScore(),
                 e.getAdvice(),
-                e.getModel_name()
+                e.getModelName(),
+                e.getSummary(),
+                e.getHighlights()
         );
     }
 }

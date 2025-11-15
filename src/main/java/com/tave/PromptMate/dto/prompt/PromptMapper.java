@@ -13,7 +13,6 @@ public class PromptMapper {
                 .category(category)
                 .title(req.title())
                 .content(req.content())
-                .isPrivate(req.isPrivate())
                 .build();
     }
 
@@ -23,8 +22,7 @@ public class PromptMapper {
                 p.getUser() != null ? p.getUser().getId() : null,
                 p.getCategory() != null ? p.getCategory().getId() : null,
                 p.getTitle(),
-                p.getContent(),
-                p.getIsPrivate()
+                p.getContent()
         );
     }
 }
