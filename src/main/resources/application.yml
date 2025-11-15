@@ -1,11 +1,16 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/promptmate
-    username: root
-    password: suji1004!
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
   profiles:
-    include: local
+    include: local, jwt, oauth
+
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST}
+      port: ${SPRING_DATA_REDIS_PORT}
 
   jpa:
     hibernate:
@@ -17,3 +22,16 @@ spring:
         show_sql: true
         format_sql: true
         use_sql_comments: true
+
+jwt:
+  expiration:
+    access: ${ACCESS_EXPIRATION:1800000}
+    refresh: ${REFRESH_EXPIRATION:2592000000}
+  secret: ${JWT_SECRET:O0qN1qz7fFvYWq6m1HZjlpajM3U4Yjrcm1DQxq8PjVrNZo+M8c2AtbT/1E84exuGdR8zNQG4Yp2xj0FSLxK+Dw==}
+
+kakao:
+  oauth:
+    client_id: ${KAKAO_CLIENT_ID}
+    redirect_uri: ${KAKAO_REDIRECT_URI}
+    token-uri: https://kauth.kakao.com/oauth/token
+    user-info-uri: https://kapi.kakao.com/v2/user/me

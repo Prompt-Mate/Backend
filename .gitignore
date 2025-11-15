@@ -46,3 +46,6 @@ src/main/resources/application-*.yaml
 
 # 샘플용 예시 파일만 쓰고 싶으면 (있을 때만)
 !src/main/resources/application-example.yml
+application-jwt.yml
+application-oauth.yml
+
