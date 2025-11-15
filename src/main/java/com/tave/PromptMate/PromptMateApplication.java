@@ -11,5 +11,4 @@ public class PromptMateApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(PromptMateApplication.class, args);
 	}
-
 }
