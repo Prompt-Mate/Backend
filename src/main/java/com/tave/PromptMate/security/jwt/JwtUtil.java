@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
@@ -131,6 +132,13 @@ public class JwtUtil {
             log.error("Failed to extract subject from token: {}", e.getMessage());
             return null; // or throw new TokenException(SecurityErrorCode.INVALID_TOKEN);
         }
+    }
+
+    //인가된 사용자 꺼내기
+    public Authentication getAuthenticationFromUserId(String userId) {
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        User principal = new User(userId, "", authorities);
+        return new UsernamePasswordAuthenticationToken(principal, null, authorities);
     }
 
 }

@@ -28,3 +28,10 @@ jwt:
     access: ${ACCESS_EXPIRATION:1800000}
     refresh: ${REFRESH_EXPIRATION:2592000000}
   secret: ${JWT_SECRET:O0qN1qz7fFvYWq6m1HZjlpajM3U4Yjrcm1DQxq8PjVrNZo+M8c2AtbT/1E84exuGdR8zNQG4Yp2xj0FSLxK+Dw==}
+
+kakao:
+  oauth:
+    client_id: ${KAKAO_CLIENT_ID}
+    redirect_uri: ${KAKAO_REDIRECT_URI}
+    token-uri: https://kauth.kakao.com/oauth/token
+    user-info-uri: https://kapi.kakao.com/v2/user/me
