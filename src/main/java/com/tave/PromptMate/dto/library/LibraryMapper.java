@@ -4,7 +4,7 @@ import com.tave.PromptMate.domain.Library;
 
 public class LibraryMapper {
 
-    public static LibraryResponse toResponse(Library e) {
+    public static LibraryResponse toResponse(Library e, Integer totalScore) {
         return new LibraryResponse(
                 e.getId(),
                 e.getUser().getId(),
@@ -12,7 +12,11 @@ public class LibraryMapper {
                 e.getRewriteResult().getId(),
                 e.getSavedTitle(),
                 e.getRewriteResult().getContent(),
-                e.getCreatedAt()
+                e.getCreatedAt(),
+                totalScore
         );
+    }
+    public static LibraryResponse toResponse(Library e){
+        return toResponse(e, null);
     }
 }

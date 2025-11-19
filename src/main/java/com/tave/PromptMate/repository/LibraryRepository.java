@@ -19,4 +19,10 @@ public interface LibraryRepository extends JpaRepository<Library, Long> {
     // 중복 저장 방지
     boolean existsByUser_IdAndRewriteResult_Id(Long userId, Long rewriteResultId);
 
+    //특정 유저 라이브러리 검색
+    List<Library> findByUser_IdAndSavedTitleContainingIgnoreCaseOrderByCreatedAtDesc(
+            Long userId,
+            String keyword
+    );
+
 }

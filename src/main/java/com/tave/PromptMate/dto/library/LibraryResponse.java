@@ -9,5 +9,7 @@ public record LibraryResponse(
         Long rewriteResultId,
         String savedTitle,
         String content,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        Integer totalScore
+
 ) {}

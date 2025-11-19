@@ -44,5 +44,16 @@ public class LibraryController {
         libraryService.delete(id, userId);
         return ResponseEntity.noContent().build();
     }
+
+    //내 라이브러리 검색
+    @GetMapping("/my/{userId}/search")
+    public ResponseEntity<List<LibraryResponse>> searchMyLibraries(
+            @PathVariable Long userId,
+            @RequestParam String keyword
+    ) {
+        return ResponseEntity.ok(
+                libraryService.searchMyLibraries(userId, keyword)
+        );
+    }
 }
 

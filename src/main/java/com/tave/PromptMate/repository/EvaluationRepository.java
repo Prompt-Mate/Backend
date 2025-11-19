@@ -58,4 +58,7 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Long> {
 
     // 프롬프트 최신 1건 (요약/하이라이트 카드용)
     Optional<Evaluation> findTopByPromptIdOrderByIdDesc(Long promptId);
+
+    //리라이팅 결과별 최신 1건 (라이브러리 카드용)
+    Optional<Evaluation> findTopByRewriteResultIdOrderByIdDesc(Long rewriteId);
 }
