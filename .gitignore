@@ -48,4 +48,3 @@ src/main/resources/application-*.yaml
 !src/main/resources/application-example.yml
 application-jwt.yml
 application-oauth.yml
-

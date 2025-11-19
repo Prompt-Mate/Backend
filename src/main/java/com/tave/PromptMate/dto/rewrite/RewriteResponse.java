@@ -1,7 +1,5 @@
 package com.tave.PromptMate.dto.rewrite;
 
-import java.time.LocalDateTime;
-
 public record RewriteResponse(
         Long id,
         Long promptId,
@@ -9,8 +7,6 @@ public record RewriteResponse(
         String content,
         Integer inputTokens,
         Integer outputTokens,
-        Long latencyMs,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        Long latencyMs
 ) {
 }
