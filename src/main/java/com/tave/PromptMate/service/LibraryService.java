@@ -30,9 +30,10 @@ public class LibraryService {
 
     // 라이브러리에 리라이팅 결과 저장하기
     public LibraryResponse save(CreateLibraryRequest req) {
-        if (libraryRepository.existsByUser_IdAndRewriteResult_Id(req.userId(), req.rewriteResultId())){
+        if (libraryRepository.existsByUser_IdAndRewriteResult_Id(req.userId(), req.rewriteResultId())) {
             throw new IllegalStateException("이미 라이브러리에 저장된 결과입니다.");
         }
+
         User user = userRepository.findById(req.userId())
                 .orElseThrow(() -> new NotFoundException("user not found: " + req.userId()));
 
@@ -47,58 +48,55 @@ public class LibraryService {
                 .build();
 
         Library saved = libraryRepository.save(library);
-        return LibraryMapper.toResponse(saved);
+
+        Integer totalScore = getLatestScore(result.getId());
+
+        return LibraryMapper.toResponse(saved, totalScore);
     }
 
-    // 내 라이브러리 목록 조회하기
     @Transactional(readOnly = true)
-    public List<LibraryResponse> getMyLibraries(Long userId){
+    public List<LibraryResponse> getMyLibraries(Long userId) {
         return libraryRepository.findByUser_IdOrderByCreatedAtDesc(userId)
                 .stream()
-                .map(library -> {
-                    Integer totalScore = evaluationRepository
-                            .findTopByRewriteResultIdOrderByIdDesc(library.getRewriteResult().getId())
-                            .map(Evaluation::getTotalScore)
-                            .orElse(null);
-                    return LibraryMapper.toResponse(library, totalScore);
-                })
+                .map(library -> LibraryMapper.toResponse(
+                        library,
+                        getLatestScore(library.getRewriteResult().getId())
+                ))
                 .toList();
     }
 
-    // 단건 조회
-    @Transactional
-    public LibraryResponse getOne(Long id, Long userId){
+    @Transactional(readOnly = true)
+    public LibraryResponse getOne(Long id, Long userId) {
         Library lib = libraryRepository.findByIdAndUser_Id(id, userId)
                 .orElseThrow(() -> new NotFoundException("library not found: " + id));
 
-        Integer totalScore = evaluationRepository
-                .findTopByRewriteResultIdOrderByIdDesc(lib.getRewriteResult().getId())
-                .map(Evaluation::getTotalScore)
-                .orElse(null);
-
+        Integer totalScore = getLatestScore(lib.getRewriteResult().getId());
         return LibraryMapper.toResponse(lib, totalScore);
     }
 
-    // 삭제하기
     public void delete(Long id, Long userId) {
         Library lib = libraryRepository.findByIdAndUser_Id(id, userId)
                 .orElseThrow(() -> new NotFoundException("library not found: " + id));
         libraryRepository.delete(lib);
     }
 
-    //라이브러리 검색
-    public List<LibraryResponse> searchMyLibraries(Long userId, String keyword){
-        return libraryRepository
-                .findByUser_IdAndSavedTitleContainingIgnoreCaseOrderByCreatedAtDesc(userId,keyword)
+    @Transactional(readOnly = true)
+    public List<LibraryResponse> searchMyLibraries(Long userId, String keyword) {
+        return libraryRepository.searchMyLibrariesNative(userId, keyword)
                 .stream()
-                .map(library -> {
-                    Integer totalScore = evaluationRepository
-                            .findTopByRewriteResultIdOrderByIdDesc(library.getRewriteResult().getId())
-                            .map(Evaluation::getTotalScore)
-                            .orElse(null);
-                    return LibraryMapper.toResponse(library, totalScore);
-                })
+                .map(library -> LibraryMapper.toResponse(
+                        library,
+                        getLatestScore(library.getRewriteResult().getId())
+                ))
                 .toList();
+    }
+
+    //  공통 점수 가져오기
+    private Integer getLatestScore(Long rewriteResultId) {
+        return evaluationRepository
+                .findTopByRewriteResultIdOrderByIdDesc(rewriteResultId)
+                .map(Evaluation::getTotalScore)
+                .orElse(null);
     }
 
 }
