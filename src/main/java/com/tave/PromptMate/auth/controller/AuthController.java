@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name="인증", description = "인증 관련 API")
+@Tag(name="카카오로그인 API")
 public class AuthController {
     private final AuthService authService;
 

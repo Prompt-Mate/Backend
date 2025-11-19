@@ -1,5 +1,8 @@
 package com.tave.PromptMate.security.jwt;
 
+import com.tave.PromptMate.auth.dto.request.CustomUserDetails;
+import com.tave.PromptMate.domain.User;
+import com.tave.PromptMate.repository.UserRepository;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -9,9 +12,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -29,6 +32,8 @@ import java.util.stream.Stream;
 public class JwtUtil {
 
     private SecretKey secretKey;
+    private final UserRepository userRepository;
+
 
     @Value("${jwt.secret}")
     private String secret;
@@ -118,11 +123,13 @@ public class JwtUtil {
                     .collect(Collectors.toList());
         }
 
-        String email=claims.get("email",String.class);
+//        User principal=new User(claims.getSubject(),"",authorities);
+        User user =userRepository.findById(Long.valueOf(claims.getSubject()))
+                .orElseThrow(()->new UsernameNotFoundException("user not found"));
 
-        //email을 principal로 사용
-        return new UsernamePasswordAuthenticationToken(email,token,authorities);
+        CustomUserDetails principal=new CustomUserDetails(user);
 
+        return new UsernamePasswordAuthenticationToken(principal,token,authorities);
     }
 
     public String getSubject(String token){
@@ -137,7 +144,7 @@ public class JwtUtil {
     //인가된 사용자 꺼내기
     public Authentication getAuthenticationFromUserId(String userId) {
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        User principal = new User(userId, "", authorities);
+        org.springframework.security.core.userdetails.User principal = new org.springframework.security.core.userdetails.User(userId, "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, null, authorities);
     }
 
