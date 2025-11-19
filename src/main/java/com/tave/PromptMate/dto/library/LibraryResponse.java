@@ -6,8 +6,12 @@ public record LibraryResponse(
         Long id,
         Long userId,
         Long promptId,
+        Long categoryId,
+        String categoryName,
         Long rewriteResultId,
         String savedTitle,
         String content,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        Integer totalScore
+
 ) {}
