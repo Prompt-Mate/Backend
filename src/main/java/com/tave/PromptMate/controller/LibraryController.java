@@ -1,5 +1,6 @@
 package com.tave.PromptMate.controller;
 
+import com.tave.PromptMate.dto.community.CommunityPostResponse;
 import com.tave.PromptMate.dto.library.CreateLibraryRequest;
 import com.tave.PromptMate.dto.library.LibraryResponse;
 import com.tave.PromptMate.service.LibraryService;
@@ -43,6 +44,15 @@ public class LibraryController {
     public ResponseEntity<Void> delete(@PathVariable Long id, @PathVariable Long userId) {
         libraryService.delete(id, userId);
         return ResponseEntity.noContent().build();
+    }
+
+    //내가 작성한 게시글 조회
+    @GetMapping("/my-posts")
+    public ResponseEntity<List<CommunityPostResponse>>getMyPosts(
+            @RequestParam Long userId
+    ){
+        List<CommunityPostResponse> posts=libraryService.getMyPosts(userId);
+        return ResponseEntity.ok(posts);
     }
 }
 
