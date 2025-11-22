@@ -1,6 +1,7 @@
 package com.tave.PromptMate.controller;
 
 import com.tave.PromptMate.auth.dto.request.CustomUserDetails;
+import com.tave.PromptMate.service.UserService;
 import com.tave.PromptMate.dto.user.NicknameRequest;
 import com.tave.PromptMate.dto.user.NicknameResponse;
 import com.tave.PromptMate.service.UserService;
@@ -27,6 +28,14 @@ public class UserController {
         Long userId=principal.getUserId();
 
         return ResponseEntity.ok("인증된 사용자 ID: " + userId);
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "로그아웃" ,description = "사용자를 로그아웃합니다.")
+    public ResponseEntity<String> logout(@AuthenticationPrincipal CustomUserDetails principal){
+        Long userId=principal.getUserId();
+        String message=userService.logout(userId);
+        return ResponseEntity.ok(message);
     }
 
     @PatchMapping("/nickname")
