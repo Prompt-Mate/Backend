@@ -71,6 +71,4 @@ public class AuthService {
     private String generateRandomNickname() {
         return "user_" + UUID.randomUUID().toString().substring(0, 8);
     }
-
-
 }
