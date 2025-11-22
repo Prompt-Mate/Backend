@@ -25,9 +25,7 @@ public final class RewriteMapper {
                 r.getContent(),
                 r.getInputTokens(),
                 r.getOutputTokens(),
-                r.getLatencyMs(),
-                r.getCreatedAt(),
-                r.getUpdatedAt()
+                r.getLatencyMs()
         );
     }
 }
