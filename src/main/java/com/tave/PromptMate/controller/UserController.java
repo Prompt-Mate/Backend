@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -32,5 +33,15 @@ public class UserController {
         Long userId=principal.getUserId();
         String message=userService.logout(userId);
         return ResponseEntity.ok(message);
+    }
+
+    @Operation(summary = "회원탈퇴", description = "사용자를 탈퇴합니다.")
+    @DeleteMapping
+    public ResponseEntity<String>deleteUser(@AuthenticationPrincipal CustomUserDetails principal){
+
+        Long userId=principal.getUserId();
+        userService.delete(userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body("회원 탈퇴 완료");
     }
 }
