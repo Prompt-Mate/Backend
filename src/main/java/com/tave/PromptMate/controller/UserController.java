@@ -1,7 +1,8 @@
 package com.tave.PromptMate.controller;
 
 import com.tave.PromptMate.auth.dto.request.CustomUserDetails;
-import com.tave.PromptMate.service.UserService;
+import com.tave.PromptMate.dto.user.NicknameRequest;
+import com.tave.PromptMate.dto.user.NicknameResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,18 @@ public class UserController {
         Long userId=principal.getUserId();
 
         return ResponseEntity.ok("인증된 사용자 ID: " + userId);
+    }
+
+    @PatchMapping("/nickname")
+    @Operation(summary = "사용자 닉네임 변경", description = "사용자의 닉네임을 변경합니다.")
+    public ResponseEntity<NicknameResponse> changeNickname(@AuthenticationPrincipal CustomUserDetails principal,
+                                           @RequestBody NicknameRequest dto) {
+        Long userId = principal.getUserId();
+
+        NicknameResponse response = userService.changeNickname(userId, dto.getNickname());
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+
     }
 
     @PostMapping("/logout")
