@@ -3,6 +3,7 @@ package com.tave.PromptMate.controller;
 import com.tave.PromptMate.auth.dto.request.CustomUserDetails;
 import com.tave.PromptMate.dto.user.NicknameRequest;
 import com.tave.PromptMate.dto.user.NicknameResponse;
+import com.tave.PromptMate.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
