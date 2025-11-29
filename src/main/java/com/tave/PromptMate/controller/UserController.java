@@ -30,22 +30,23 @@ public class UserController {
         return ResponseEntity.ok("인증된 사용자 ID: " + userId);
     }
 
+    @PatchMapping("/nickname")
+    @Operation(summary = "사용자 닉네임 변경", description = "사용자의 닉네임을 변경합니다.")
+    public ResponseEntity<NicknameResponse> changeNickname(@AuthenticationPrincipal CustomUserDetails principal,
+                                           @RequestBody NicknameRequest dto) {
+        Long userId = principal.getUserId();
+
+        NicknameResponse response = userService.changeNickname(userId, dto.getNickname());
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+    }
+
     @PostMapping("/logout")
     @Operation(summary = "로그아웃" ,description = "사용자를 로그아웃합니다.")
     public ResponseEntity<String> logout(@AuthenticationPrincipal CustomUserDetails principal){
         Long userId=principal.getUserId();
         String message=userService.logout(userId);
         return ResponseEntity.ok(message);
-    }
-
-    @PatchMapping("/nickname")
-    @Operation(summary = "사용자 닉네임 변경", description = "사용자의 닉네임을 변경합니다.")
-    public ResponseEntity<NicknameResponse> changeNickname(@AuthenticationPrincipal CustomUserDetails principal,
-                                           @RequestBody NicknameRequest dto){
-        Long userId=principal.getUserId();
-
-        NicknameResponse response=userService.changeNickname(userId,dto.getNickname());
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
