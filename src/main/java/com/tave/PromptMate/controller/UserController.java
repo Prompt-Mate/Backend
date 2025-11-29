@@ -1,7 +1,6 @@
 package com.tave.PromptMate.controller;
 
 import com.tave.PromptMate.auth.dto.request.CustomUserDetails;
-import com.tave.PromptMate.service.UserService;
 import com.tave.PromptMate.dto.user.NicknameRequest;
 import com.tave.PromptMate.dto.user.NicknameResponse;
 import com.tave.PromptMate.service.UserService;
@@ -48,5 +47,15 @@ public class UserController {
         Long userId=principal.getUserId();
         String message=userService.logout(userId);
         return ResponseEntity.ok(message);
+    }
+
+    @Operation(summary = "회원탈퇴", description = "사용자를 탈퇴합니다.")
+    @DeleteMapping
+    public ResponseEntity<String>deleteUser(@AuthenticationPrincipal CustomUserDetails principal){
+
+        Long userId=principal.getUserId();
+        userService.delete(userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body("회원 탈퇴 완료");
     }
 }
