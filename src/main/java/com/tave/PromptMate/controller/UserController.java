@@ -38,5 +38,11 @@ public class UserController {
         NicknameResponse response=userService.changeNickname(userId,dto.getNickname());
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    @PostMapping("/logout")
+    @Operation(summary = "로그아웃" ,description = "사용자를 로그아웃합니다.")
+    public ResponseEntity<String> logout(@AuthenticationPrincipal CustomUserDetails principal){
+        Long userId=principal.getUserId();
+        String message=userService.logout(userId);
+        return ResponseEntity.ok(message);
     }
 }
