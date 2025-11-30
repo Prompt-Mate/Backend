@@ -31,7 +31,7 @@ jobs:
 
       - name: Build & Push Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/promprtmate .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/promptmate .
           docker push ${{ secrets.DOCKER_USERNAME }}/promptmate
 
       - name: Copy Docker Compose & Dockerfile to EC2
