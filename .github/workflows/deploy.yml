@@ -2,8 +2,8 @@ name: CI/CD using github actions & docker
 
 on:
   push:
-    branches: [ "main" ]
-
+#    branches: [ "main" ]
+    branches: [ "deploy/33/cicd" ]
   workflow_dispatch:
 
 jobs:
@@ -31,8 +31,8 @@ jobs:
 
       - name: Build & Push Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/myproject-test .
-          docker push ${{ secrets.DOCKER_USERNAME }}/myproject-test
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/promprtmate .
+          docker push ${{ secrets.DOCKER_USERNAME }}/promptmate
 
       - name: Copy Docker Compose & Dockerfile to EC2
         uses: appleboy/scp-action@v0.1.5
@@ -55,11 +55,11 @@ jobs:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.6
         with:
-          host: ${{ secrets.EC2_HOST }}    #54.116.13.185
+          host: ${{ secrets.EC2_HOST }}    #15.164.131.214
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            cd ~/myproject
+            cd ~/promptmate
             docker compose down || true
             docker compose pull
             docker compose up -d --force-recreate
