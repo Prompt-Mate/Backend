@@ -2,8 +2,8 @@ name: CI/CD using github actions & docker
 
 on:
   push:
-#    branches: [ "main" ]
-    branches: [ "deploy/33/cicd" ]
+    branches: [ "main" ]
+
   workflow_dispatch:
 
 jobs:
