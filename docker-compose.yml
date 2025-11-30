@@ -18,6 +18,7 @@ services:
       - ACCESS_EXPIRATION=${ACCESS_EXPIRATION}
       - REFRESH_EXPIRATION=${REFRESH_EXPIRATION}
       - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST}
+      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT}
   redis:
     image: redis:6.2
     container_name: redis-promptmate
