@@ -49,3 +49,6 @@ src/main/resources/application-*.yaml
 application-jwt.yml
 application-oauth.yml
 
+# 환경 변수 파일
+.env
+.env.*

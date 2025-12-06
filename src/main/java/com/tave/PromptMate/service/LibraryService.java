@@ -31,12 +31,12 @@ public class LibraryService {
     private final CommunityRepository communityRepository;
 
     // 라이브러리에 리라이팅 결과 저장하기
-    public LibraryResponse save(CreateLibraryRequest req) {
-        if (libraryRepository.existsByUser_IdAndRewriteResult_Id(req.userId(), req.rewriteResultId())){
+    public LibraryResponse save(CreateLibraryRequest req, Long userId) {
+        if (libraryRepository.existsByUser_IdAndRewriteResult_Id(userId, req.rewriteResultId())){
             throw new IllegalStateException("이미 라이브러리에 저장된 결과입니다.");
         }
-        User user = userRepository.findById(req.userId())
-                .orElseThrow(() -> new NotFoundException("user not found: " + req.userId()));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("user not found: " + userId));
 
         RewriteResult result = rewriteResultRepository.findById(req.rewriteResultId())
                 .orElseThrow(() -> new NotFoundException("rewrite result not found: " + req.rewriteResultId()));
