@@ -58,4 +58,9 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).body("회원 탈퇴 완료");
     }
+
+    @GetMapping("/test")
+    public String home() {
+        return "Hello1";
+    }
 }
