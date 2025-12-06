@@ -7,9 +7,6 @@ import jakarta.validation.constraints.NotNull;
 public record CreateCommunityPostRequest(
 
         @NotNull
-        Long userId,               // 임시
-
-        @NotNull
         Long categoryId,
 
         @NotBlank
@@ -17,9 +14,6 @@ public record CreateCommunityPostRequest(
 
         @NotBlank
         String promptContent,
-
-        @NotBlank
-        String description,
 
         @NotNull
         Visibility visibility

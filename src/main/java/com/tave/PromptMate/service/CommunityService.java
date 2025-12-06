@@ -23,10 +23,10 @@ public class CommunityService {
     private final PromptRepository promptRepository;
     private final CategoryRepository categoryRepository;
 
-    public CommunityPostResponse createPost(CreateCommunityPostRequest req) {
+    public CommunityPostResponse createPost(CreateCommunityPostRequest req, Long userId) {
 
-        User user = userRepository.findById(req.userId())
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 사용자입니다. id=" + req.userId()));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 사용자입니다. id=" + userId));
 
         Category category = categoryRepository.findById(req.categoryId())
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 카테고리입니다. id=" + req.categoryId()));
@@ -37,7 +37,6 @@ public class CommunityService {
                 .category(category)
                 .title(req.title())
                 .content(req.promptContent())
-                //.isPrivate(false)
                 .build();
 
         Prompt savedPrompt = promptRepository.save(prompt);
