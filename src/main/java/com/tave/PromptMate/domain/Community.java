@@ -33,6 +33,12 @@ public class Community extends BaseTimeEntity{
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @Column(name = "title", nullable = false)
+    private String title;
+
+    @Column(name = "promptContent", nullable = false, columnDefinition = "TEXT")
+    private String promptContent;
+
     @Enumerated(EnumType.STRING)
     @Column(name="visibility", nullable = false, length = 20)
     private Visibility visibility;
@@ -44,12 +50,16 @@ public class Community extends BaseTimeEntity{
             User user,
             Prompt prompt,
             Category category,
+            String  title,
+            String promptContent,
             Visibility visibility
     ){
         Community community=new Community();
         community.user=user;
         community.prompt=prompt;
         community.category=category;
+        community.title=title;
+        community.promptContent=promptContent;
         community.visibility=visibility;
         return community;
     }
