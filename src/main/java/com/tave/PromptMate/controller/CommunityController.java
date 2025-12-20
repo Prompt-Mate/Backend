@@ -25,7 +25,6 @@ public class CommunityController {
             @AuthenticationPrincipal CustomUserDetails principal,
             @Valid @RequestBody CreateCommunityPostRequest request
     ) {
-
         Long userId=principal.getUserId();
 
         CommunityPostResponse response = communityService.createPost(request, userId);
