@@ -46,6 +46,8 @@ public class CommunityService {
                 user,
                 savedPrompt,
                 category,
+                req.title(),
+                req.promptContent(),
                 req.visibility()
         );
 
