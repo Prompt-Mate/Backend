@@ -9,6 +9,7 @@ import com.tave.PromptMate.auth.dto.response.JwtLoginResponse;
 import com.tave.PromptMate.auth.dto.response.KakaoUserInfo;
 import com.tave.PromptMate.auth.dto.response.LoginResponse;
 import com.tave.PromptMate.domain.AuthProvider;
+import com.tave.PromptMate.domain.Role;
 import com.tave.PromptMate.domain.User;
 import com.tave.PromptMate.redis.service.RefreshTokenRedisService;
 import com.tave.PromptMate.repository.UserRepository;
@@ -94,9 +95,45 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .nickname(generateRandomNickname())
                 .authProvider(AuthProvider.LOCAL)
+                .role(Role.USER)
                 .build();
 
         userRepository.save(user);
     }
 
+    public LoginResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계정입니다."));
+
+        // 비밀번호 검증
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 토큰 생성
+        Authentication authentication = createAuthentication(user);
+        String userId = String.valueOf(user.getId());
+
+        String accessToken = jwtUtil.generateAccessToken(authentication, userId);
+        String refreshToken = jwtUtil.generateRefreshToken(authentication, userId);
+
+        // Redis에 Refresh Token 저장
+        refreshTokenRedisService.saveRefreshToken(user.getId(), refreshToken,REFRESH_TOKEN_EXPIRE_TIME);
+
+        return LoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .userId(user.getId())
+                .nickname(user.getNickname())
+                .build();
+    }
+
+    private Authentication createAuthentication(User user) {
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+        return new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
+
+    }
 }
