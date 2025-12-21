@@ -11,6 +11,7 @@ import com.tave.PromptMate.auth.dto.response.LoginResponse;
 import com.tave.PromptMate.domain.AuthProvider;
 import com.tave.PromptMate.domain.Role;
 import com.tave.PromptMate.domain.User;
+import com.tave.PromptMate.redis.entity.RefreshToken;
 import com.tave.PromptMate.redis.service.RefreshTokenRedisService;
 import com.tave.PromptMate.repository.UserRepository;
 import com.tave.PromptMate.security.jwt.JwtUtil;
@@ -22,6 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -59,6 +61,7 @@ public class AuthService {
                     return userRepository.save(User.builder()
                                     .email(email)
                                     .nickname(nicknameToUse)
+                                    .authProvider(AuthProvider.KAKAO)
                                     .imageUrl(profileImage)
                             .build());
                 });
@@ -80,6 +83,29 @@ public class AuthService {
     //닉네임 랜덤 생성
     private String generateRandomNickname() {
         return "user_" + UUID.randomUUID().toString().substring(0, 8);
+    }
+
+    //백엔드 확인용
+    public String reissueAccessToken(String refreshToken) throws Exception {
+
+        // refreshToken 유효성 검사
+        if (jwtUtil.isExpired(refreshToken)) {
+            throw new Exception("유효하지 않은 토큰입니다.");
+        }
+
+        // refreshToken에서 userId 추출
+        String userId = jwtUtil.getSubject(refreshToken);
+
+        // redis에서 refreshToken 검증
+        Optional<RefreshToken> optionalRefresh = refreshTokenRedisService.findRefreshToken(Long.parseLong(userId));
+
+        if (optionalRefresh.isEmpty() || !optionalRefresh.get().getRefreshToken().equals(refreshToken)) {
+            throw new Exception("로그인이 만료되었습니다. 다시 로그인해주세요.");
+        }
+
+        // 새 access token 생성
+        Authentication authentication = jwtUtil.getAuthenticationFromUserId(userId);
+        return jwtUtil.generateAccessToken(authentication, userId);
     }
 
     //서비스 자체 회원가입
