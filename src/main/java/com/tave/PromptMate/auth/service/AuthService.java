@@ -60,6 +60,7 @@ public class AuthService {
                     return userRepository.save(User.builder()
                                     .email(email)
                                     .nickname(nicknameToUse)
+                                    .authProvider(AuthProvider.KAKAO)
                                     .imageUrl(profileImage)
                             .build());
                 });
