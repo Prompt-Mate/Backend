@@ -2,8 +2,13 @@ package com.tave.PromptMate.auth.service;
 
 import com.tave.PromptMate.auth.client.KakaoApiClient;
 import com.tave.PromptMate.auth.converter.AuthConverter;
+import com.tave.PromptMate.auth.dto.request.CustomUserDetails;
+import com.tave.PromptMate.auth.dto.request.LoginRequest;
+import com.tave.PromptMate.auth.dto.request.SignUpRequest;
 import com.tave.PromptMate.auth.dto.response.JwtLoginResponse;
 import com.tave.PromptMate.auth.dto.response.KakaoUserInfo;
+import com.tave.PromptMate.auth.dto.response.LoginResponse;
+import com.tave.PromptMate.domain.AuthProvider;
 import com.tave.PromptMate.domain.User;
 import com.tave.PromptMate.redis.service.RefreshTokenRedisService;
 import com.tave.PromptMate.repository.UserRepository;
@@ -11,7 +16,9 @@ import com.tave.PromptMate.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -25,6 +32,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final KakaoApiClient kakaoApiClient;
     private final RefreshTokenRedisService refreshTokenRedisService;
+    private final BCryptPasswordEncoder passwordEncoder;  // 주입
 
     @Value("${jwt.expiration.access}")
     private Long ACCESS_TOKEN_EXPIRE_TIME;
@@ -32,6 +40,7 @@ public class AuthService {
     @Value("${jwt.expiration.refresh}")
     private Long REFRESH_TOKEN_EXPIRE_TIME;
 
+    //카카오로그인
     public JwtLoginResponse loginOrRegister(String code){
 
         //1. 인가 코드로 카카오 access token 요청
@@ -71,4 +80,23 @@ public class AuthService {
     private String generateRandomNickname() {
         return "user_" + UUID.randomUUID().toString().substring(0, 8);
     }
+
+    //서비스 자체 회원가입
+    public void signUp(SignUpRequest request) {
+
+        //이메일 중복 체크
+        if (userRepository.existsByEmail(request.getEmail())){
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+        }
+
+        User user=User.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .nickname(generateRandomNickname())
+                .authProvider(AuthProvider.LOCAL)
+                .build();
+
+        userRepository.save(user);
+    }
+
 }
