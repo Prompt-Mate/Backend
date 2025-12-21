@@ -7,11 +7,8 @@ import com.tave.PromptMate.auth.dto.response.TokenResponse;
 import com.tave.PromptMate.auth.dto.response.LoginResponse;
 import com.tave.PromptMate.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.Token;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.swing.plaf.TabbedPaneUI;
 
 @RestController
 @RequiredArgsConstructor
@@ -59,6 +54,14 @@ public class AuthController {
         authService.signUp(request);
 
         return ResponseEntity.status(HttpStatus.OK).body("회원가입 완료");
+    }
+
+    @PostMapping("/api/auth/login")
+    @Operation(summary = "로그인")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request){
+        LoginResponse response =authService.login(request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }
