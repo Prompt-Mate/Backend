@@ -1,42 +1,56 @@
 package com.tave.PromptMate.dto.evaluation;
 
 import com.tave.PromptMate.domain.Evaluation;
-import com.tave.PromptMate.domain.Prompt;
 import com.tave.PromptMate.domain.RewriteResult;
+import com.tave.PromptMate.domain.Prompt;
 
-public final class EvaluationMapper {
-    private EvaluationMapper(){}
+public class EvaluationMapper {
 
-    public static Evaluation toEntity(CreateEvaluationRequest req, Prompt p, RewriteResult r) {
+
+    public static Evaluation toEntity(CreateEvaluationRequest req, Prompt prompt, RewriteResult rewrite) {
         return Evaluation.builder()
-                .prompt(p)
-                .rewriteResult(r)
-                .clarity(req.clarity())
-                .specificity(req.specificity())
-                .context(req.context())
-                .creativity(req.creativity())
-                .totalScore(req.totalScore())
-                .advice(req.advice())
-                .modelName(req.modelName())
-                .summary(req.summary())
-                .highlights(req.highlights())
+                .prompt(prompt)
+                .rewriteResult(rewrite)
+
+                .overallScore(req.overallScore())
+                .clarityScore(req.clarityScore())
+                .specificityScore(req.specificityScore())
+                .structureScore(req.structureScore())
+                .languageScore(req.languageScore())
+                .consistencyScore(req.consistencyScore())
+
+                .clarityComment(req.clarityComment())
+                .specificityComment(req.specificityComment())
+                .structureComment(req.structureComment())
+                .languageComment(req.languageComment())
+                .consistencyComment(req.consistencyComment())
+
+                .summary(req.summaryFeedback())
+
                 .build();
     }
 
-    public static EvaluationResponse toResponse(Evaluation e) {
+    public static EvaluationResponse toResponse(Evaluation eval) {
         return new EvaluationResponse(
-                e.getId(),
-                e.getPrompt().getId(),
-                e.getRewriteResult().getId(),
-                e.getClarity(),
-                e.getSpecificity(),
-                e.getContext(),
-                e.getCreativity(),
-                e.getTotalScore(),
-                e.getAdvice(),
-                e.getModelName(),
-                e.getSummary(),
-                e.getHighlights()
+                eval.getId(),
+                eval.getPrompt().getId(),
+                eval.getRewriteResult().getId(),
+
+                eval.getOverallScore(),
+                eval.getClarityScore(),
+                eval.getSpecificityScore(),
+                eval.getStructureScore(),
+                eval.getLanguageScore(),
+                eval.getConsistencyScore(),
+
+                eval.getClarityComment(),
+                eval.getSpecificityComment(),
+                eval.getStructureComment(),
+                eval.getLanguageComment(),
+                eval.getConsistencyComment(),
+
+                eval.getSummary()
         );
     }
+
 }

@@ -87,13 +87,21 @@ public class EvaluationService {
 
         // 평균값 계산
         Object[] avg = evaluationRepository.avgByPromptId(promptId);
-        Double clarityAvg = null, specificityAvg = null, contextAvg = null, creativityAvg = null, totalAvg = null;
-        if (avg != null && avg.length == 5) {
+
+        Double clarityAvg = null;
+        Double specificityAvg = null;
+        Double structureAvg = null;
+        Double languageAvg = null;
+        Double consistencyAvg = null;
+        Double overallAvg = null;
+
+        if (avg != null && avg.length == 6) {
             clarityAvg     = castToDouble(avg[0]);
             specificityAvg = castToDouble(avg[1]);
-            contextAvg     = castToDouble(avg[2]);
-            creativityAvg  = castToDouble(avg[3]);
-            totalAvg       = castToDouble(avg[4]);
+            structureAvg   = castToDouble(avg[2]);
+            languageAvg    = castToDouble(avg[3]);
+            consistencyAvg = castToDouble(avg[4]);
+            overallAvg     = castToDouble(avg[5]);
         }
 
         // 최신 1건 조회 (람다 대신 if/else)
@@ -102,18 +110,17 @@ public class EvaluationService {
             var latest = latestOpt.get();
             return new EvaluationSummaryResponse(
                     promptId,
-                    clarityAvg, specificityAvg, contextAvg, creativityAvg, totalAvg,
-                    latest.getSummary(),
+                    clarityAvg, specificityAvg, structureAvg, languageAvg, consistencyAvg, overallAvg,
+                    latest.getSummary(),       // summaryFeedback
                     latest.getHighlights(),
                     latest.getModelName(),
-                    latest.getAdvice(),
                     latest.getCreatedAt()
             );
         } else {
             return new EvaluationSummaryResponse(
                     promptId,
-                    clarityAvg, specificityAvg, contextAvg, creativityAvg, totalAvg,
-                    null, null, null, null, null
+                    clarityAvg, specificityAvg, structureAvg, languageAvg, consistencyAvg, overallAvg,
+                    null, null, null, null
             );
         }
     }

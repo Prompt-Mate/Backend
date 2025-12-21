@@ -8,13 +8,14 @@ public record EvaluationSummaryResponse(
         Long promptId,
         Double clarityAvg,
         Double specificityAvg,
-        Double contextAvg,
-        Double creativityAvg,
-        Double totalScoreAvg,
+        Double structureAvg,
+        Double languageAvg,
+        Double consistencyAvg,
+        Double overallAvg,
         String latestSummary,
         HighlightsPayload latestHighlights,
         String latestModelName,
-        String latestAdvice,
         LocalDateTime latestCreatedAt
-) {
+
+        ) {
 }
