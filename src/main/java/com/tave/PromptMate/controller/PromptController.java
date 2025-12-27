@@ -1,6 +1,7 @@
 package com.tave.PromptMate.controller;
 
 import com.tave.PromptMate.dto.prompt.CreatePromptRequest;
+import com.tave.PromptMate.dto.prompt.PromptAutoResponse;
 import com.tave.PromptMate.dto.prompt.PromptResponse;
 import com.tave.PromptMate.dto.prompt.UpdatePromptRequest;
 import com.tave.PromptMate.service.PromptService;
@@ -28,6 +29,18 @@ public class PromptController {
                 .created(URI.create("/api/prompts/" + res.id()))
                 .body(res);
     }
+
+    @PostMapping("/auto")
+    public ResponseEntity<PromptAutoResponse> createAuto(@Valid @RequestBody CreatePromptRequest req) {
+
+        PromptAutoResponse res = promptService.createAuto(req);
+
+        return ResponseEntity
+                .created(URI.create("/api/prompts/" + res.promptId()))
+                .body(res);
+    }
+
+
 
     // 전체 프롬프트 목록 조회 (페이징)
     @GetMapping

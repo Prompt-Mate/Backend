@@ -1,6 +1,5 @@
 package com.tave.PromptMate.controller;
 
-import com.tave.PromptMate.dto.evaluation.CreateEvaluationRequest;
 import com.tave.PromptMate.dto.evaluation.EvaluationResponse;
 import com.tave.PromptMate.dto.evaluation.EvaluationSummaryResponse;
 import com.tave.PromptMate.service.EvaluationService;
@@ -9,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.tave.PromptMate.dto.evaluation.AutoEvaluationRequest;
 
 import java.net.URI;
 
@@ -19,10 +19,9 @@ public class EvaluationController {
 
     private final EvaluationService evaluationService;
 
-    // 평가 생성하기
-    @PostMapping
-    public ResponseEntity<EvaluationResponse> create(@Valid @RequestBody CreateEvaluationRequest req){
-        EvaluationResponse res = evaluationService.createEvaluation(req);
+    @PostMapping("/auto")
+    public ResponseEntity<EvaluationResponse> createAuto(@Valid @RequestBody AutoEvaluationRequest req){
+        EvaluationResponse res = evaluationService.createAutoEvaluation(req.promptId(), req.rewriteId());
         return ResponseEntity
                 .created(URI.create("/api/evaluations/" + res.id()))
                 .body(res);

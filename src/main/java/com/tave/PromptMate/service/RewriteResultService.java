@@ -11,6 +11,8 @@ import com.tave.PromptMate.repository.RewriteResultRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.tave.PromptMate.common.RewriteRunner;
+
 
 import java.util.List;
 
@@ -21,6 +23,32 @@ public class RewriteResultService {
 
     private final RewriteResultRepository rewriteResultRepository;
     private final PromptRepository promptRepository;
+    private final RewriteRunner rewriteRunner;
+
+    public RewriteResponse createAuto(Long promptId) {
+
+        Prompt prompt = promptRepository.findById(promptId)
+                .orElseThrow(() -> new NotFoundException("prompt not found: " + promptId));
+
+        String before = prompt.getContent();
+
+        var ai = rewriteRunner.run(before);
+
+        CreateRewriteRequest req = new CreateRewriteRequest(
+                promptId,
+                prompt.getUser().getId(),           // userId (두 번째 Long)
+                before,                             // beforeContent
+                ai.rewrittenContent(),              // rewrittenContent
+                ai.inputTokens(),
+                ai.outputTokens(),
+                ai.latencyMs()
+        );
+
+        RewriteResult entity = RewriteMapper.toEntity(req, prompt);
+        rewriteResultRepository.save(entity);
+
+        return RewriteMapper.toResponse(entity);
+    }
 
     // 리라이팅 결과 생성(저장)하기
     public RewriteResponse create(CreateRewriteRequest req){
