@@ -9,11 +9,14 @@ public record CreateCommunityPostRequest(
         @NotNull
         Long categoryId,
 
+        @NotNull
+        Long promptId,
+
         @NotBlank
         String title,
 
         @NotBlank
-        String promptContent,
+        String description,
 
         @NotNull
         Visibility visibility
