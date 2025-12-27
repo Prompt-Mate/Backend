@@ -1,8 +1,6 @@
 package com.tave.PromptMate.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,17 +25,44 @@ public class Evaluation extends BaseTimeEntity {
     @JoinColumn(name = "rewrite_id")
     private RewriteResult rewriteResult;
 
-    @Column(nullable = false)
-    private Integer clarity;
-    @Column(nullable = false)
-    private Integer specificity;
-    @Column(nullable = false)
-    private Integer context;
-    @Column(nullable = false)
-    private Integer creativity;
+    @Column(name = "overall_score", nullable = false)
+    private Integer overallScore;
 
-    @Column(nullable = false)
-    private String advice;
+    @Column(name = "clarity_score", nullable = false)
+    private Integer clarityScore;
+
+    @Column(name = "specificity_score", nullable = false)
+    private Integer specificityScore;
+
+    @Column(name = "structure_score", nullable = false)
+    private Integer structureScore;
+
+    @Column(name = "language_score", nullable = false)
+    private Integer languageScore;
+
+    @Column(name = "consistency_score", nullable = false)
+    private Integer consistencyScore;
+
+    @Lob
+    @Column(name = "clarity_comment")
+    private String clarityComment;
+
+    @Lob
+    @Column(name = "specificity_comment")
+    private String specificityComment;
+
+    @Lob
+    @Column(name = "structure_comment")
+    private String structureComment;
+
+    @Lob
+    @Column(name = "language_comment")
+    private String languageComment;
+
+    @Lob
+    @Column(name = "consistency_comment")
+    private String consistencyComment;
+
 
     @Column
     private String version;
@@ -45,10 +70,7 @@ public class Evaluation extends BaseTimeEntity {
     @Column(name = "model_name", nullable = false)
     private String modelName;
 
-    @Column(name = "total_score", nullable = false)
-    @Min(0) @Max(100)
-    private Integer totalScore;
-
+    // AI 요약 피드백(summary_feedback)을 여기에 저장
     @Lob
     @Column(name = "summary")
     private String summary;

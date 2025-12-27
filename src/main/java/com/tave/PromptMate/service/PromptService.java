@@ -4,10 +4,9 @@ import com.tave.PromptMate.common.NotFoundException;
 import com.tave.PromptMate.domain.Category;
 import com.tave.PromptMate.domain.Prompt;
 import com.tave.PromptMate.domain.User;
-import com.tave.PromptMate.dto.prompt.CreatePromptRequest;
-import com.tave.PromptMate.dto.prompt.PromptMapper;
-import com.tave.PromptMate.dto.prompt.PromptResponse;
-import com.tave.PromptMate.dto.prompt.UpdatePromptRequest;
+import com.tave.PromptMate.dto.evaluation.EvaluationResponse;
+import com.tave.PromptMate.dto.prompt.*;
+import com.tave.PromptMate.dto.rewrite.RewriteResponse;
 import com.tave.PromptMate.repository.CategoryRepository;
 import com.tave.PromptMate.repository.PromptRepository;
 import com.tave.PromptMate.repository.UserRepository;
@@ -23,11 +22,40 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+
+
 public class PromptService {
 
+    private final RewriteResultService rewriteResultService;
+    private final EvaluationService evaluationService;
     private final PromptRepository promptRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+
+    @Transactional
+    public PromptAutoResponse createAuto(CreatePromptRequest req) {
+
+        // 1) 프롬프트 저장 (기존 create 재사용)
+        PromptResponse created = create(req);
+
+        // 2) 방금 저장된 promptId
+        Long promptId = created.id();
+
+        // 3) 리라이트 자동 생성 + 저장
+        RewriteResponse rewrite = rewriteResultService.createAuto(promptId);
+
+        // 4) 평가 자동 생성 + 저장 (너가 이미 만들어둔 거)
+        EvaluationResponse evaluation = evaluationService.createAutoEvaluation(promptId, rewrite.id());
+
+        // 5) 한번에 반환
+        return new PromptAutoResponse(
+                promptId,
+                rewrite.id(),
+                rewrite.content(),
+                evaluation
+        );
+    }
+
 
     // 프롬프트 작성
     public PromptResponse create(CreatePromptRequest req) {
@@ -40,14 +68,24 @@ public class PromptService {
                     .orElseThrow(() -> new NotFoundException("category not found: " + req.categoryId()));
         }
 
-        Prompt prompt = PromptMapper.toEntity(req, user, category);
+        boolean isPrivate = (req.isPrivate() != null) ? req.isPrivate() : false;
+
+        Prompt prompt = Prompt.builder()
+                .user(user)
+                .category(category)
+                .title(req.title())
+                .content(req.content())
+                .isPrivate(isPrivate)
+                .build();
+
         Prompt saved = promptRepository.save(prompt);
         return PromptMapper.toResponse(saved);
     }
 
+
     // 전체 프롬프트 목록 조회
     @Transactional(readOnly = true)
-    public Page<PromptResponse> getPage(int page, int size){
+    public Page<PromptResponse> getPage(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return promptRepository.findByDeletedFalse(pageable).map(PromptMapper::toResponse);
     }
@@ -89,7 +127,6 @@ public class PromptService {
         Prompt prompt = promptRepository.findById(promptId)
                 .orElseThrow(() -> new NotFoundException("prompt not found: " + promptId));
 
-        // 내가 쓴 글이 아니면 삭제 불가
         if (!prompt.getUser().getId().equals(requestUserId)) {
             throw new IllegalStateException("no permission to delete this prompt");
         }
@@ -97,35 +134,34 @@ public class PromptService {
     }
 
     // 프롬프트 수정
-    public PromptResponse update(Long promptId, Long requestUserId, UpdatePromptRequest req){
+    public PromptResponse update(Long promptId, Long requestUserId, UpdatePromptRequest req) {
         Prompt prompt = promptRepository.findById(promptId)
                 .orElseThrow(() -> new NotFoundException("prompt not found: " + promptId));
-        if (!prompt.getUser().getId().equals(requestUserId)){
+
+        if (!prompt.getUser().getId().equals(requestUserId)) {
             throw new IllegalStateException("no permission to edit");
         }
 
-        // 카테고리 변경하기
-        if (req.categoryId() != null){
+        if (req.categoryId() != null) {
             Category category = categoryRepository.findById(req.categoryId())
                     .orElseThrow(() -> new NotFoundException("category not found: " + req.categoryId()));
             prompt.changeCategory(category);
         }
 
-        // 제목 변경
         if (req.title() != null) {
             prompt.changeTitle(req.title());
         }
 
-        // 내용 변경
         if (req.content() != null && !req.content().isBlank()) {
             prompt.changeContent(req.content());
         }
+
         return PromptMapper.toResponse(prompt);
     }
 
     // 키워드 검색
     @Transactional(readOnly = true)
-    public Page<PromptResponse> search(String keyword, int page, int size){
+    public Page<PromptResponse> search(String keyword, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return promptRepository.searchByKeyword(keyword, pageable)
                 .map(PromptMapper::toResponse);

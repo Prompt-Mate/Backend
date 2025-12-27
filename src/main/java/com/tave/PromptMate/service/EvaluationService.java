@@ -1,13 +1,11 @@
 package com.tave.PromptMate.service;
 
+import com.tave.PromptMate.common.JudgeRunner;
 import com.tave.PromptMate.common.NotFoundException;
 import com.tave.PromptMate.domain.Evaluation;
 import com.tave.PromptMate.domain.Prompt;
 import com.tave.PromptMate.domain.RewriteResult;
-import com.tave.PromptMate.dto.evaluation.CreateEvaluationRequest;
-import com.tave.PromptMate.dto.evaluation.EvaluationMapper;
-import com.tave.PromptMate.dto.evaluation.EvaluationResponse;
-import com.tave.PromptMate.dto.evaluation.EvaluationSummaryResponse;
+import com.tave.PromptMate.dto.evaluation.*;
 import com.tave.PromptMate.repository.EvaluationRepository;
 import com.tave.PromptMate.repository.PromptRepository;
 import com.tave.PromptMate.repository.RewriteResultRepository;
@@ -29,16 +27,52 @@ public class EvaluationService {
     private final PromptRepository promptRepository;
     private final RewriteResultRepository rewriteResultRepository;
     private final EvaluationRepository evaluationRepository;
+    private final JudgeRunner judgeRunner;
 
-    // 평가 생성하기
-    public EvaluationResponse createEvaluation(CreateEvaluationRequest req){
-        Prompt prompt = promptRepository.findById(req.promptId())
-                .orElseThrow(()-> new NotFoundException("prompt not found: "+req.promptId()));
-        RewriteResult rewrite = rewriteResultRepository.findById(req.rewriteId())
-                .orElseThrow(()->new NotFoundException("rewrite result not found: "+req.rewriteId()));
+
+    // AI로 평가 자동 생성하기
+    public EvaluationResponse createAutoEvaluation(Long promptId, Long rewriteId){
+        Prompt prompt = promptRepository.findById(promptId)
+                .orElseThrow(() -> new NotFoundException("prompt not found: " + promptId));
+
+        RewriteResult rewrite = rewriteResultRepository.findById(rewriteId)
+                .orElseThrow(() -> new NotFoundException("rewrite result not found: " + rewriteId));
+
+
+        var existing = evaluationRepository
+                .findByPromptIdAndRewriteResultId(promptId, rewriteId);
+        if (existing.isPresent()) {
+            return EvaluationMapper.toResponse(existing.get());
+        }
+
+        String before = prompt.getContent();
+        String after = rewrite.getContent();
+
+        AiEvaluationResult ai = judgeRunner.run(before, after);
 
         Evaluation saved = evaluationRepository.save(
-                EvaluationMapper.toEntity(req, prompt, rewrite)
+                Evaluation.builder()
+                        .prompt(prompt)
+                        .rewriteResult(rewrite)
+
+                        .overallScore(ai.overallScore())
+                        .clarityScore(ai.clarityScore())
+                        .specificityScore(ai.specificityScore())
+                        .structureScore(ai.structureScore())
+                        .languageScore(ai.languageScore())
+                        .consistencyScore(ai.consistencyScore())
+
+                        .clarityComment(ai.clarityComment())
+                        .specificityComment(ai.specificityComment())
+                        .structureComment(ai.structureComment())
+                        .languageComment(ai.languageComment())
+                        .consistencyComment(ai.consistencyComment())
+
+                        .summary(ai.summaryFeedback())
+
+                        .modelName(ai.modelName() == null ? rewrite.getModelName() : ai.modelName())
+                        .version(ai.version())
+                        .build()
         );
         return EvaluationMapper.toResponse(saved);
     }
@@ -87,13 +121,21 @@ public class EvaluationService {
 
         // 평균값 계산
         Object[] avg = evaluationRepository.avgByPromptId(promptId);
-        Double clarityAvg = null, specificityAvg = null, contextAvg = null, creativityAvg = null, totalAvg = null;
-        if (avg != null && avg.length == 5) {
+
+        Double clarityAvg = null;
+        Double specificityAvg = null;
+        Double structureAvg = null;
+        Double languageAvg = null;
+        Double consistencyAvg = null;
+        Double overallAvg = null;
+
+        if (avg != null && avg.length == 6) {
             clarityAvg     = castToDouble(avg[0]);
             specificityAvg = castToDouble(avg[1]);
-            contextAvg     = castToDouble(avg[2]);
-            creativityAvg  = castToDouble(avg[3]);
-            totalAvg       = castToDouble(avg[4]);
+            structureAvg   = castToDouble(avg[2]);
+            languageAvg    = castToDouble(avg[3]);
+            consistencyAvg = castToDouble(avg[4]);
+            overallAvg     = castToDouble(avg[5]);
         }
 
         // 최신 1건 조회 (람다 대신 if/else)
@@ -102,18 +144,17 @@ public class EvaluationService {
             var latest = latestOpt.get();
             return new EvaluationSummaryResponse(
                     promptId,
-                    clarityAvg, specificityAvg, contextAvg, creativityAvg, totalAvg,
-                    latest.getSummary(),
+                    clarityAvg, specificityAvg, structureAvg, languageAvg, consistencyAvg, overallAvg,
+                    latest.getSummary(),       // summaryFeedback
                     latest.getHighlights(),
                     latest.getModelName(),
-                    latest.getAdvice(),
                     latest.getCreatedAt()
             );
         } else {
             return new EvaluationSummaryResponse(
                     promptId,
-                    clarityAvg, specificityAvg, contextAvg, creativityAvg, totalAvg,
-                    null, null, null, null, null
+                    clarityAvg, specificityAvg, structureAvg, languageAvg, consistencyAvg, overallAvg,
+                    null, null, null, null
             );
         }
     }

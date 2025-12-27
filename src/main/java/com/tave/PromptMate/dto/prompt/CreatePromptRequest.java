@@ -7,5 +7,6 @@ public record CreatePromptRequest(
         @NotNull Long userId,
         Long categoryId,
         @NotBlank String title,
-        @NotBlank String content
+        @NotBlank String content,
+        Boolean isPrivate
 ) {}
