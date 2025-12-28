@@ -30,6 +30,10 @@ public class Community extends BaseTimeEntity{
     private Prompt prompt;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rewrite_result_id", nullable = false)
+    private RewriteResult rewriteResult;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
@@ -50,6 +54,7 @@ public class Community extends BaseTimeEntity{
     public static Community create(
             User user,
             Prompt prompt,
+            RewriteResult rewriteResult,
             Category category,
             String  title,
             String description,
@@ -58,7 +63,8 @@ public class Community extends BaseTimeEntity{
     ){
         Community community=new Community();
         community.user=user;
-        community.prompt=prompt;
+        community.prompt = prompt;
+        community.rewriteResult=rewriteResult;
         community.category=category;
         community.title=title;
         community.description=description;

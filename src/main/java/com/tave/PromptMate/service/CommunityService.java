@@ -6,10 +6,7 @@ import com.tave.PromptMate.dto.community.CommunityPostMapper;
 import com.tave.PromptMate.dto.community.CommunityPostResponse;
 import com.tave.PromptMate.dto.community.CreateCommunityPostRequest;
 import com.tave.PromptMate.dto.community.UpdateCommunityPostRequest;
-import com.tave.PromptMate.repository.CategoryRepository;
-import com.tave.PromptMate.repository.CommunityRepository;
-import com.tave.PromptMate.repository.PromptRepository;
-import com.tave.PromptMate.repository.UserRepository;
+import com.tave.PromptMate.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +18,7 @@ public class CommunityService {
 
     private final CommunityRepository communityRepository;
     private final UserRepository userRepository;
+    private final RewriteResultRepository rewriteResultRepository;
     private final PromptRepository promptRepository;
     private final CategoryRepository categoryRepository;
 
@@ -32,18 +30,21 @@ public class CommunityService {
         Category category = categoryRepository.findById(req.categoryId())
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 카테고리입니다. id=" + req.categoryId()));
 
-        // 1) 프롬프트 생성
-        Prompt prompt = promptRepository.findById(req.promptId())
-                .orElseThrow(()->new NotFoundException("존재하지 않는 프롬프트입니다.id=" + req.promptId()));
+        // 1) 리라이팅 결과 조회
+        RewriteResult rewriteResult= rewriteResultRepository.findById(req.rewriteResultId())
+                .orElseThrow(()->new NotFoundException("존재하지 않는 리라이팅 결과입니다. id="+req.rewriteResultId()));
 
-        Prompt savedPrompt = promptRepository.save(prompt);
+        Prompt prompt = rewriteResult.getPrompt();
 
-        String promptContent= prompt.getContent();
+        // 2) 글 작성 시 프롬프트 내용=리라이팅 결과
+        String promptContent= rewriteResult.getContent();
 
-        // 2) 커뮤니티 엔티티 생성
+
+        // 3) 커뮤니티 엔티티 생성
         Community community = Community.create(
                 user,
                 prompt,
+                rewriteResult,
                 category,
                 req.title(),
                 req.description(),

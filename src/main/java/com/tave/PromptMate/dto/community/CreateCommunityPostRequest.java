@@ -10,7 +10,7 @@ public record CreateCommunityPostRequest(
         Long categoryId,
 
         @NotNull
-        Long promptId,
+        Long rewriteResultId,
 
         @NotBlank
         String title,
