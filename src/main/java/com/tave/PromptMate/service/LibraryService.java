@@ -87,8 +87,8 @@ public class LibraryService {
         post.remove();
 
         // postId로 정확히 해당 라이브러리만 삭제
-        //libraryRepository.findByCommunity_Id(postId)
-          //      .ifPresent(libraryRepository::delete);
+        libraryRepository.findByCommunity_Id(postId)
+                .ifPresent(libraryRepository::delete);
 
     }
 

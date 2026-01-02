@@ -20,7 +20,7 @@ public class CommunityService {
     private final RewriteResultRepository rewriteResultRepository;
     private final PromptRepository promptRepository;
     private final CategoryRepository categoryRepository;
-
+    private final LibraryRepository libraryRepository;
     private final CommentRepository commentRepository;
     private final CommunityLikeService communityLikeService;
 
@@ -56,11 +56,22 @@ public class CommunityService {
 
         Community savedCommunity = communityRepository.save(community);
 
+        Library library = Library.builder()
+                .user(user)
+                .prompt(prompt)
+                .rewriteResult(rewriteResult)
+                .community(savedCommunity)
+                .savedTitle(req.title())  // 커뮤니티 글 제목을 라이브러리 제목으로 사용
+                .build();
+        libraryRepository.save(library);
+
         long likeCount= 0L;
         long commentCount=0L;
         boolean isLiked=false;
 
         return CommunityPostMapper.toResponse(savedCommunity, likeCount, commentCount, isLiked);
+
+
     }
 
     @Transactional
@@ -96,6 +107,10 @@ public class CommunityService {
         }
 
         post.remove();
+
+        // 라이브러리에서도 삭제
+        libraryRepository.findByCommunity_Id(postId).ifPresent(libraryRepository::delete);
+
     }
     // 4) 게시글 목록 조회(최신순/조회순/좋아요순)
     @Transactional(readOnly = true)
