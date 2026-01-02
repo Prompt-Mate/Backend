@@ -6,6 +6,7 @@ import com.tave.PromptMate.dto.community.CommunityPostMapper;
 import com.tave.PromptMate.dto.community.CommunityPostResponse;
 import com.tave.PromptMate.dto.community.CreateCommunityPostRequest;
 import com.tave.PromptMate.dto.community.UpdateCommunityPostRequest;
+import com.tave.PromptMate.dto.library.LibraryMapper;
 import com.tave.PromptMate.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class CommunityService {
     private final RewriteResultRepository rewriteResultRepository;
     private final PromptRepository promptRepository;
     private final CategoryRepository categoryRepository;
+    private final LibraryRepository libraryRepository;
 
     public CommunityPostResponse createPost(CreateCommunityPostRequest req, Long userId) {
 
@@ -51,6 +53,17 @@ public class CommunityService {
                 promptContent,
                 req.visibility()
         );
+
+        Library library = Library.builder()
+                .user(user)
+                .prompt(prompt)
+                .rewriteResult(rewriteResult)
+                .community(community)
+                .savedTitle(req.title())  // 커뮤니티 글 제목을 라이브러리 제목으로 사용
+                .build();
+        libraryRepository.save(library);
+
+
 
         Community savedCommunity = communityRepository.save(community);
 
@@ -84,5 +97,9 @@ public class CommunityService {
         }
 
         post.remove();
+
+        // 라이브러리에서도 삭제
+        libraryRepository.findByCommunity_Id(postId).ifPresent(libraryRepository::delete);
+
     }
 }

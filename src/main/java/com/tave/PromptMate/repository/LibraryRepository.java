@@ -19,4 +19,8 @@ public interface LibraryRepository extends JpaRepository<Library, Long> {
     // 중복 저장 방지
     boolean existsByUser_IdAndRewriteResult_Id(Long userId, Long rewriteResultId);
 
+    Optional<Library> findByUser_IdAndRewriteResult_Id(Long userId, Long rewriteResultId);
+
+    Optional<Library> findByCommunity_Id(Long communityId);
+
 }

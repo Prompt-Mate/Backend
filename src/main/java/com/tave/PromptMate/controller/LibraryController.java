@@ -63,6 +63,16 @@ public class LibraryController {
         return ResponseEntity.noContent().build();
     }
 
+    //내가 작성한 게시글 삭제
+    @DeleteMapping("/my-posts/{postId}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId, @AuthenticationPrincipal CustomUserDetails principal){
+        Long userId=principal.getUserId();
+
+        libraryService.deletePost(postId,userId);
+
+        return ResponseEntity.noContent().build();
+    }
+
     //내가 작성한 게시글 조회
     @GetMapping("/my-posts")
     public ResponseEntity<List<CommunityPostResponse>>getMyPosts(
