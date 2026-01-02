@@ -76,6 +76,23 @@ public class LibraryService {
         libraryRepository.delete(lib);
     }
 
+    //내가 작성한 게시글 삭제
+    public void deletePost(Long postId, Long userId){
+        Community post = communityRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 게시글입니다. id=" + postId));
+
+        if (!post.getUser().getId().equals(userId)) {
+            throw new IllegalStateException("삭제 권한이 없습니다.");
+        }
+
+        post.remove();
+
+        // postId로 정확히 해당 라이브러리만 삭제
+        libraryRepository.findByCommunity_Id(postId)
+                .ifPresent(libraryRepository::delete);
+
+    }
+
     //내가 작성한 커뮤니티 글 조회
     public List<CommunityPostResponse> getMyPosts(Long userId){
 

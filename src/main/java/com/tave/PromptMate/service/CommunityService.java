@@ -58,6 +58,7 @@ public class CommunityService {
                 .user(user)
                 .prompt(prompt)
                 .rewriteResult(rewriteResult)
+                .community(community)
                 .savedTitle(req.title())  // 커뮤니티 글 제목을 라이브러리 제목으로 사용
                 .build();
         libraryRepository.save(library);
@@ -96,5 +97,10 @@ public class CommunityService {
         }
 
         post.remove();
+
+        // 라이브러리에서도 삭제
+        libraryRepository.findByUser_IdAndRewriteResult_Id(userId, post.getRewriteResult().getId())
+                .ifPresent(libraryRepository::delete);
+
     }
 }
