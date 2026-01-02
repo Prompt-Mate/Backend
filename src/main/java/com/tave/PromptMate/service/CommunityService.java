@@ -99,8 +99,7 @@ public class CommunityService {
         post.remove();
 
         // 라이브러리에서도 삭제
-        libraryRepository.findByUser_IdAndRewriteResult_Id(userId, post.getRewriteResult().getId())
-                .ifPresent(libraryRepository::delete);
+        libraryRepository.findByCommunity_Id(postId).ifPresent(libraryRepository::delete);
 
     }
 }
