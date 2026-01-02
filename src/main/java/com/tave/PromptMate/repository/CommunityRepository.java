@@ -2,7 +2,10 @@ package com.tave.PromptMate.repository;
 
 import com.tave.PromptMate.domain.Community;
 import com.tave.PromptMate.domain.Community.Visibility;
+import com.tave.PromptMate.dto.community.CommunityPostRow;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -13,4 +16,96 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
             Long userId,
             Visibility visibility
     );
+
+    // 1) 최신순
+    @Query("""
+                select new com.tave.PromptMate.dto.community.CommunityPostRow(
+                    c.id,
+                    rr.id,
+                    u.id,
+                    u.nickname,
+                    cat.id,
+                    cat.name,
+                    c.title,
+                    c.promptContent,
+                    c.visibility,
+                    c.createdAt,
+                    c.viewCount,
+                    (select count(cl) from CommunityLike cl where cl.community.id = c.id),
+                    (select count(cm) from Comment cm where cm.community.id = c.id),
+                    (case when :userId is null then false
+                          when (select count(cl2) from CommunityLike cl2
+                                where cl2.community.id = c.id and cl2.user.id = :userId) > 0
+                          then true else false end)
+                )
+                from Community c
+                join c.rewriteResult rr
+                join c.user u
+                join c.category cat
+                where c.visibility <> com.tave.PromptMate.domain.Community.Visibility.REMOVED
+                order by c.createdAt desc
+            """)
+    List<CommunityPostRow> findAllLatest(@Param("userId") Long userId);
+
+    // 2) 조회순
+    @Query("""
+                select new com.tave.PromptMate.dto.community.CommunityPostRow(
+                    c.id,
+                    rr.id,
+                    u.id,
+                    u.nickname,
+                    cat.id,
+                    cat.name,
+                    c.title,
+                    c.promptContent,
+                    c.visibility,
+                    c.createdAt,
+                    c.viewCount,
+                    (select count(cl) from CommunityLike cl where cl.community.id = c.id),
+                    (select count(cm) from Comment cm where cm.community.id = c.id),
+                    (case when :userId is null then false
+                          when (select count(cl2) from CommunityLike cl2
+                                where cl2.community.id = c.id and cl2.user.id = :userId) > 0
+                          then true else false end)
+                )
+                from Community c
+                join c.rewriteResult rr
+                join c.user u
+                join c.category cat
+                where c.visibility <> com.tave.PromptMate.domain.Community.Visibility.REMOVED
+                order by c.viewCount desc, c.createdAt desc
+            """)
+    List<CommunityPostRow> findAllView(@Param("userId") Long userId);
+
+    // 3) 좋아요순
+    @Query("""
+                select new com.tave.PromptMate.dto.community.CommunityPostRow(
+                    c.id,
+                    rr.id,
+                    u.id,
+                    u.nickname,
+                    cat.id,
+                    cat.name,
+                    c.title,
+                    c.promptContent,
+                    c.visibility,
+                    c.createdAt,
+                    c.viewCount,
+                    (select count(cl) from CommunityLike cl where cl.community.id = c.id),
+                    (select count(cm) from Comment cm where cm.community.id = c.id),
+                    (case when :userId is null then false
+                          when (select count(cl2) from CommunityLike cl2
+                                where cl2.community.id = c.id and cl2.user.id = :userId) > 0
+                          then true else false end)
+                )
+                from Community c
+                join c.rewriteResult rr
+                join c.user u
+                join c.category cat
+                where c.visibility <> com.tave.PromptMate.domain.Community.Visibility.REMOVED
+                order by
+                    (select count(cl) from CommunityLike cl where cl.community.id = c.id) desc,
+                    c.createdAt desc
+            """)
+    List<CommunityPostRow> findAllLike(@Param("userId") Long userId);
 }

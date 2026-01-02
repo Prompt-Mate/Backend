@@ -10,10 +10,7 @@ import com.tave.PromptMate.dto.community.CommunityPostResponse;
 import com.tave.PromptMate.dto.library.CreateLibraryRequest;
 import com.tave.PromptMate.dto.library.LibraryMapper;
 import com.tave.PromptMate.dto.library.LibraryResponse;
-import com.tave.PromptMate.repository.CommunityRepository;
-import com.tave.PromptMate.repository.LibraryRepository;
-import com.tave.PromptMate.repository.RewriteResultRepository;
-import com.tave.PromptMate.repository.UserRepository;
+import com.tave.PromptMate.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +26,8 @@ public class LibraryService {
     private final UserRepository userRepository;
     private final LibraryRepository libraryRepository;
     private final CommunityRepository communityRepository;
+    private final CommunityLikeService communityLikeService;
+    private final CommentRepository commentRepository;
 
     // 라이브러리에 리라이팅 결과 저장하기
     public LibraryResponse save(CreateLibraryRequest req, Long userId) {
@@ -88,8 +87,8 @@ public class LibraryService {
         post.remove();
 
         // postId로 정확히 해당 라이브러리만 삭제
-        libraryRepository.findByCommunity_Id(postId)
-                .ifPresent(libraryRepository::delete);
+        //libraryRepository.findByCommunity_Id(postId)
+          //      .ifPresent(libraryRepository::delete);
 
     }
 
@@ -102,7 +101,14 @@ public class LibraryService {
                         Community.Visibility.REMOVED
                 );
         return posts.stream()
-                .map(CommunityPostMapper::toResponse)
+                .map(post->{
+
+                    long likeCount= communityLikeService.getLikeCount(post.getId());
+                    long commentCount=commentRepository.countByCommunityId(post.getId());
+                    boolean isLiked= communityLikeService.isLiked(post.getId(), userId);
+
+                    return CommunityPostMapper.toResponse(post,likeCount,commentCount,isLiked);
+                })
                 .toList();
     }
 }
