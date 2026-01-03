@@ -21,7 +21,7 @@ public class KakaoApiClient {
     @Value("${kakao.oauth.client-id}")
     private String kakaoClientId;
 
-    @Value("${kakao.oauth.redirect-uri}")
+    @Value("${kakao.oauth.frontend-redirect-uri}")
     private String kakaoRedirectUri;
 
     private final RestTemplate restTemplate;
