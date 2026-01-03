@@ -3,10 +3,12 @@ package com.tave.PromptMate.dto.community;
 import com.tave.PromptMate.domain.Community;
 import com.tave.PromptMate.domain.Prompt;
 import com.tave.PromptMate.domain.RewriteResult;
+import com.tave.PromptMate.service.CommunityLikeService;
 
 public class CommunityPostMapper {
 
-    public static CommunityPostResponse toResponse(Community community) {
+    public static CommunityPostResponse toResponse(Community community, long likeCount, long commentCount, boolean isLiked) {
+
         RewriteResult rewriteResult=community.getRewriteResult();
 
         return new CommunityPostResponse(
@@ -19,7 +21,12 @@ public class CommunityPostMapper {
                 community.getTitle(),
                 rewriteResult.getContent(),
                 community.getVisibility(),
-                community.getCreatedAt()
+                community.getCreatedAt(),
+                community.getViewCount(),
+                likeCount,
+                commentCount,
+                isLiked
+
         );
     }
 }

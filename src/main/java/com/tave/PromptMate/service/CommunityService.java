@@ -2,15 +2,13 @@ package com.tave.PromptMate.service;
 
 import com.tave.PromptMate.common.NotFoundException;
 import com.tave.PromptMate.domain.*;
-import com.tave.PromptMate.dto.community.CommunityPostMapper;
-import com.tave.PromptMate.dto.community.CommunityPostResponse;
-import com.tave.PromptMate.dto.community.CreateCommunityPostRequest;
-import com.tave.PromptMate.dto.community.UpdateCommunityPostRequest;
-import com.tave.PromptMate.dto.library.LibraryMapper;
+import com.tave.PromptMate.dto.community.*;
 import com.tave.PromptMate.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +21,8 @@ public class CommunityService {
     private final PromptRepository promptRepository;
     private final CategoryRepository categoryRepository;
     private final LibraryRepository libraryRepository;
+    private final CommentRepository commentRepository;
+    private final CommunityLikeService communityLikeService;
 
     public CommunityPostResponse createPost(CreateCommunityPostRequest req, Long userId) {
 
@@ -54,21 +54,27 @@ public class CommunityService {
                 req.visibility()
         );
 
+        Community savedCommunity = communityRepository.save(community);
+
         Library library = Library.builder()
                 .user(user)
                 .prompt(prompt)
                 .rewriteResult(rewriteResult)
-                .community(community)
+                .community(savedCommunity)
                 .savedTitle(req.title())  // 커뮤니티 글 제목을 라이브러리 제목으로 사용
                 .build();
         libraryRepository.save(library);
 
+        long likeCount= 0L;
+        long commentCount=0L;
+        boolean isLiked=false;
+
+        return CommunityPostMapper.toResponse(savedCommunity, likeCount, commentCount, isLiked);
 
 
-        Community savedCommunity = communityRepository.save(community);
-
-        return CommunityPostMapper.toResponse(savedCommunity);
     }
+
+    @Transactional
     public CommunityPostResponse updatePost(Long postId, UpdateCommunityPostRequest req, Long userId){
         Community post=communityRepository.findById(postId)
                 .orElseThrow(()->new NotFoundException("존재하지 않는 게시글입니다. id="+postId));
@@ -85,7 +91,11 @@ public class CommunityService {
         //커뮤니티 수정
         post.update(req.title(), req.description(), req.visibility());
 
-        return CommunityPostMapper.toResponse(post);
+        long likeCount= communityLikeService.getLikeCount(post.getId());
+        long commentCount=commentRepository.countByCommunityId(post.getId());
+        boolean isLiked= communityLikeService.isLiked(post.getId(), userId);
+
+        return CommunityPostMapper.toResponse(post, likeCount, commentCount, isLiked);
     }
 
     public void deletePost(Long postId, Long userId){
@@ -101,5 +111,57 @@ public class CommunityService {
         // 라이브러리에서도 삭제
         libraryRepository.findByCommunity_Id(postId).ifPresent(libraryRepository::delete);
 
+    }
+    // 4) 게시글 목록 조회(최신순/조회순/좋아요순)
+    @Transactional(readOnly = true)
+    public List<CommunityPostResponse> getPosts(String sort, Long userId) {
+
+        String s = (sort == null) ? "latest" : sort;
+
+        List<CommunityPostRow> rows = switch (s) {
+            case "latest" -> communityRepository.findAllLatest(userId);
+            case "view" -> communityRepository.findAllView(userId);
+            case "like" -> communityRepository.findAllLike(userId);
+            default -> communityRepository.findAllLatest(userId);
+        };
+
+        return rows.stream()
+                .map(r -> new CommunityPostResponse(
+                        r.id(),
+                        r.rewriteResultId(),
+                        r.userId(),
+                        r.nickname(),
+                        r.categoryId(),
+                        r.categoryName(),
+                        r.title(),
+                        r.promptContent(),
+                        r.visibility(),
+                        r.createdAt(),
+                        r.viewCount(),
+                        r.likeCount(),
+                        r.commentCount(),
+                        r.isLiked()
+                ))
+                .toList();
+    }
+
+    // 5) 게시글 단건 조회
+    @Transactional
+    public CommunityPostResponse getPost(Long postId, Long userId) {
+
+        Community post = communityRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 게시글입니다. id=" + postId));
+
+        if (post.getVisibility() == Community.Visibility.REMOVED) {
+            throw new NotFoundException("삭제된 게시글입니다.");
+        }
+
+        post.increaseViewCount();
+
+        long likeCount = communityLikeService.getLikeCount(postId);
+        long commentCount=commentRepository.countByCommunityId(postId);
+        boolean isLiked = communityLikeService.isLiked(postId, userId);
+
+        return CommunityPostMapper.toResponse(post, likeCount, commentCount, isLiked);
     }
 }

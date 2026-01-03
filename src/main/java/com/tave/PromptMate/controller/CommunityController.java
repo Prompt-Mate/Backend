@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -57,4 +58,25 @@ public class CommunityController {
         communityService.deletePost(postId, userId);
         return ResponseEntity.noContent().build();
     }
+
+    // 커뮤니티 글 목록 조회(최신순/조회순/좋아요순)
+    @GetMapping("/posts")
+    public ResponseEntity<List<CommunityPostResponse>> getPosts(
+            @RequestParam(required = false) String sort,
+            @AuthenticationPrincipal CustomUserDetails principal
+    ) {
+        Long userId = (principal == null) ? null : principal.getUserId();
+        return ResponseEntity.ok(communityService.getPosts(sort, userId));
+    }
+
+    // 커뮤니티 글 단건 조회
+    @GetMapping("/posts/{postId}")
+    public ResponseEntity<CommunityPostResponse> getPost(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal CustomUserDetails principal
+    ) {
+        Long userId = (principal == null) ? null : principal.getUserId();
+        return ResponseEntity.ok(communityService.getPost(postId, userId));
+    }
+
 }

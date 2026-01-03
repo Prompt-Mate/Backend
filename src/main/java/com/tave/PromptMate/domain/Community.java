@@ -50,6 +50,9 @@ public class Community extends BaseTimeEntity{
     @Column(name="visibility", nullable = false, length = 20)
     private Visibility visibility;
 
+    @Column(name = "view_count", nullable = false)
+    private long viewCount=0L;
+
 
     public static Community create(
             User user,
@@ -85,4 +88,9 @@ public class Community extends BaseTimeEntity{
     public void remove(){
         this.visibility=Visibility.REMOVED;
     }
+
+    public void increaseViewCount(){
+        this.viewCount++;
+    }
+
 }
