@@ -1,6 +1,7 @@
 package com.tave.PromptMate.controller;
 
 import com.tave.PromptMate.auth.dto.request.CustomUserDetails;
+import com.tave.PromptMate.dto.community.CommunityLikeToggleResponse;
 import com.tave.PromptMate.service.CommunityLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,20 +16,13 @@ public class CommunityLikeController {
     private final CommunityLikeService communityLikeService;
 
     @PostMapping("/{communityId}/likes")
-    public ResponseEntity<Void> like(
+    public ResponseEntity<CommunityLikeToggleResponse> toggleLike(
             @PathVariable Long communityId,
             @AuthenticationPrincipal CustomUserDetails userDetails
-            ){
-        communityLikeService.like(communityId, userDetails.getUserId());
-        return ResponseEntity.ok().build();
-    }
+    ) {
+        CommunityLikeToggleResponse response =
+                communityLikeService.toggleLike(communityId, userDetails.getUserId());
 
-    @DeleteMapping("/{communityId}/likes")
-    public ResponseEntity<Void> unlike(
-            @PathVariable Long communityId,
-            @AuthenticationPrincipal CustomUserDetails userDetails
-    ){
-        communityLikeService.unlike(communityId, userDetails.getUserId());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(response);
     }
 }
