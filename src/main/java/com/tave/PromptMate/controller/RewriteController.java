@@ -1,7 +1,7 @@
 package com.tave.PromptMate.controller;
 
-import com.tave.PromptMate.dto.rewrite.CreateRewriteRequest;
-import com.tave.PromptMate.dto.rewrite.RewriteResponse;
+import com.tave.PromptMate.common.RewriteRunner;
+import com.tave.PromptMate.dto.rewrite.*;
 import com.tave.PromptMate.service.RewriteResultService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +17,24 @@ import java.util.List;
 public class RewriteController {
 
     private final RewriteResultService rewriteResultService;
+    private final RewriteRunner rewriteRunner;
+
+
+    @PostMapping("/rewrite")
+    public ResponseEntity<RewritePreviewResponse> preview(@Valid @RequestBody RewritePreviewRequest req) {
+        AiRewriteResult result = rewriteRunner.run(req.prompt());
+        System.out.println("RewriteRunner bean = " + rewriteRunner.getClass().getName());
+
+
+        return ResponseEntity.ok(new RewritePreviewResponse(
+                result.rewrittenContent(),
+                result.latencyMs(),
+                result.modelName(),
+                result.version()
+        ));
+
+    }
+
 
     // 리라이티 결과 생성(저장)하기
     @PostMapping("rewrite-results")
