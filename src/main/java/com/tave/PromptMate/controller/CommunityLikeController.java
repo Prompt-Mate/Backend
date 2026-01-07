@@ -22,7 +22,6 @@ public class CommunityLikeController {
     ) {
         CommunityLikeToggleResponse response =
                 communityLikeService.toggleLike(communityId, userDetails.getUserId());
-
         return ResponseEntity.ok(response);
     }
 }
