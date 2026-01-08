@@ -12,6 +12,10 @@ import com.tave.PromptMate.dto.library.LibraryMapper;
 import com.tave.PromptMate.dto.library.LibraryResponse;
 import com.tave.PromptMate.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +32,7 @@ public class LibraryService {
     private final CommunityRepository communityRepository;
     private final CommunityLikeService communityLikeService;
     private final CommentRepository commentRepository;
+    private final CommunityLikeRepository communityLikeRepository;
 
     // 라이브러리에 리라이팅 결과 저장하기
     public LibraryResponse save(CreateLibraryRequest req, Long userId) {
@@ -45,6 +50,8 @@ public class LibraryService {
                 .prompt(result.getPrompt())
                 .rewriteResult(result)
                 .savedTitle(req.savedTitle())
+                .platform(req.platform())
+                .category(req.category())
                 .build();
 
         Library saved = libraryRepository.save(library);
@@ -110,5 +117,53 @@ public class LibraryService {
                     return CommunityPostMapper.toResponse(post,likeCount,commentCount,isLiked);
                 })
                 .toList();
+    }
+
+    //내가 좋아요한 프롬프트 조회
+    public Page<CommunityPostResponse> getLikedPosts(Long userId,int page, int size){
+        Pageable pageable=PageRequest.of(page,size,Sort.by(Sort.Direction.DESC,"id"));
+
+        Page<Long> likedCommunityIds=communityLikeRepository.findLikedCommunityIds(userId,pageable);
+
+        List<Long> ids=likedCommunityIds.getContent();
+        List<Community> posts=communityRepository.findAllById(ids);
+
+        var postMap=posts.stream().collect(java.util.stream.Collectors.toMap(Community::getId,p->p));
+
+        return likedCommunityIds.map(id->{
+            Community post=postMap.get(id);
+            if(post==null){
+                throw new NotFoundException("community not found: "+id);
+            }
+
+            long likeCount= communityLikeService.getLikeCount(post.getId());
+            long commentCount=commentRepository.countByCommunityId(post.getId());
+            boolean isLiked=true;
+
+            return CommunityPostMapper.toResponse(post, likeCount,commentCount,isLiked);
+        });
+    }
+
+    // 검색 필터 페이징
+    @Transactional(readOnly = true)
+    public Page<LibraryResponse> searchMyLibraries(
+            Long userId,
+            String keyword,
+            String platform,
+            String category,
+            int page,
+            int size
+    ){
+        Pageable pageable= PageRequest.of(page,size, Sort.by(Sort.Direction.DESC,"createdAt"));
+
+        Page<Library> libraries=
+                libraryRepository.searchMyLibraries(
+                        userId,
+                        keyword,
+                        platform,
+                        category,
+                        pageable
+                );
+        return libraries.map(LibraryMapper::toResponse);
     }
 }
