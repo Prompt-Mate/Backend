@@ -79,10 +79,6 @@ public class CommunityService {
         Community post=communityRepository.findById(postId)
                 .orElseThrow(()->new NotFoundException("존재하지 않는 게시글입니다. id="+postId));
 
-        if(post.getVisibility()==Community.Visibility.REMOVED){
-            throw new NotFoundException("삭제된 게시글입니다.");
-        }
-
         //작성자 검증
         if(!post.getUser().getId().equals(userId)){
             throw new IllegalStateException("수정 권한이 없습니다.");
@@ -106,10 +102,13 @@ public class CommunityService {
             throw new IllegalStateException("삭제 권한이 없습니다. ");
         }
 
-        post.remove();
+        communityLikeService.deleteAllByPostId(postId);
 
-        // 라이브러리에서도 삭제
+        commentRepository.deleteByCommunityId(postId);
+
         libraryRepository.findByCommunity_Id(postId).ifPresent(libraryRepository::delete);
+
+        communityRepository.delete(post);
 
     }
     // 4) 게시글 목록 조회(최신순/조회순/좋아요순)
@@ -152,9 +151,6 @@ public class CommunityService {
         Community post = communityRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 게시글입니다. id=" + postId));
 
-        if (post.getVisibility() == Community.Visibility.REMOVED) {
-            throw new NotFoundException("삭제된 게시글입니다.");
-        }
 
         post.increaseViewCount();
 

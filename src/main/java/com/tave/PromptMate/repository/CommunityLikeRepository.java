@@ -10,4 +10,6 @@ public interface CommunityLikeRepository extends JpaRepository<CommunityLike, Lo
     long countByCommunityId(Long communityId);
 
     void deleteByUserIdAndCommunityId(Long userId, Long communityId);
+
+    void deleteByCommunityId(Long communityId);
 }
