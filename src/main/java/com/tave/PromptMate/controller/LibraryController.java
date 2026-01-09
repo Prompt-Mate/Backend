@@ -39,15 +39,12 @@ public class LibraryController {
     @GetMapping("/my")
     public ResponseEntity<Page<LibraryResponse>> myList(
             @AuthenticationPrincipal CustomUserDetails principal,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String platform,
-            @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size
     ){
 
         Long userId=principal.getUserId();
-        return ResponseEntity.ok(libraryService.searchMyLibraries(userId,keyword,platform,category,page,size));
+        return ResponseEntity.ok(libraryService.getMyLibraries(userId,page,size));
     }
 
     // 단건 조회
@@ -102,4 +99,23 @@ public class LibraryController {
         Long userId=principal.getUserId();
         return ResponseEntity.ok(libraryService.getLikedPosts(userId,page,size));
     }
+
+    //검색(태그, 키워드 기반)
+    @GetMapping("/search")
+    public ResponseEntity<Page<LibraryResponse>> search(
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String platform,
+            @RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size
+    ){
+        Long userId = principal.getUserId();
+        return ResponseEntity.ok(
+                libraryService.searchMyLibraries(
+                        userId, keyword, platform, category, page, size
+                )
+        );
+    }
+
 }

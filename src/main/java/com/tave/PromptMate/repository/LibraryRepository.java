@@ -16,6 +16,8 @@ public interface LibraryRepository extends JpaRepository<Library, Long> {
     // 특정 유저 라이브러리 목록 - 최신순
     List<Library> findByUser_IdOrderByCreatedAtDesc(Long userId);
 
+    Page<Library> findByUser_Id(Long userId, Pageable pageable);
+
     // 특정 유저의 단건 조회
     Optional<Library> findByIdAndUser_Id(Long id, Long userId);
 
