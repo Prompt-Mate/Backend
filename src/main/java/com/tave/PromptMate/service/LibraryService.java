@@ -60,12 +60,12 @@ public class LibraryService {
 
     // 내 라이브러리 목록 조회하기
     @Transactional(readOnly = true)
-    public List<LibraryResponse> getMyLibraries(Long userId){
-        return libraryRepository.findByUser_IdOrderByCreatedAtDesc(userId)
-                .stream()
-                .map(LibraryMapper::toResponse)
-                .toList();
+    public Page<LibraryResponse> getMyLibraries(Long userId, int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return libraryRepository.findByUser_Id(userId, pageable)
+                .map(LibraryMapper::toResponse);
     }
+
 
     // 단건 조회
     @Transactional
