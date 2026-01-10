@@ -40,3 +40,7 @@ kakao:
     token-uri: https://kauth.kakao.com/oauth/token
     user-info-uri: https://kapi.kakao.com/v2/user/me
     frontend-redirect-uri: ${KAKAO_FRONTEND_REDIRECT_URI}
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY}

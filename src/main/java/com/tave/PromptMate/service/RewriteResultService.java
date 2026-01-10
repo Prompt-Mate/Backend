@@ -1,8 +1,10 @@
 package com.tave.PromptMate.service;
 
 import com.tave.PromptMate.common.NotFoundException;
+import com.tave.PromptMate.common.RewriteRunner;
 import com.tave.PromptMate.domain.Prompt;
 import com.tave.PromptMate.domain.RewriteResult;
+import com.tave.PromptMate.dto.rewrite.AiRewriteResult;
 import com.tave.PromptMate.dto.rewrite.CreateRewriteRequest;
 import com.tave.PromptMate.dto.rewrite.RewriteMapper;
 import com.tave.PromptMate.dto.rewrite.RewriteResponse;
@@ -11,8 +13,6 @@ import com.tave.PromptMate.repository.RewriteResultRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.tave.PromptMate.common.RewriteRunner;
-
 
 import java.util.List;
 
@@ -24,6 +24,27 @@ public class RewriteResultService {
     private final RewriteResultRepository rewriteResultRepository;
     private final PromptRepository promptRepository;
     private final RewriteRunner rewriteRunner;
+
+
+    public Long createDraft(Long userId, String beforePrompt, AiRewriteResult ai) {
+
+        RewriteResult entity = RewriteResult.builder()
+                .userId(userId)
+                .prompt(null)
+                .modelName(ai.modelName())
+                .inputTokens(ai.inputTokens())
+                .outputTokens(ai.outputTokens())
+                .latencyMs(ai.latencyMs())
+                .content(ai.rewrittenContent())
+                .build();
+
+        rewriteResultRepository.save(entity);
+        return entity.getId();
+    }
+
+
+
+
 
     public RewriteResponse createAuto(Long promptId) {
 
