@@ -26,15 +26,19 @@ public class LibraryService {
     private final LibraryRepository libraryRepository;
 
     // 라이브러리에 리라이팅 결과 저장하기
-    public LibraryResponse save(CreateLibraryRequest req) {
-        if (libraryRepository.existsByUser_IdAndRewriteResult_Id(req.userId(), req.rewriteResultId())){
+    public LibraryResponse save(Long userId,CreateLibraryRequest req) {
+        if (libraryRepository.existsByUser_IdAndRewriteResult_Id(userId, req.rewriteResultId())){
             throw new IllegalStateException("이미 라이브러리에 저장된 결과입니다.");
         }
-        User user = userRepository.findById(req.userId())
-                .orElseThrow(() -> new NotFoundException("user not found: " + req.userId()));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("user not found: " + userId));
 
         RewriteResult result = rewriteResultRepository.findById(req.rewriteResultId())
                 .orElseThrow(() -> new NotFoundException("rewrite result not found: " + req.rewriteResultId()));
+
+        if(result.getPrompt()==null){
+            throw new IllegalStateException("rewriteResult.prompt 가 null 입니다. createDraft 저장 로직에서 prompt 연결을 확인하세요. id=" + result.getId());
+        }
 
         Library library = Library.builder()
                 .user(user)
@@ -43,8 +47,7 @@ public class LibraryService {
                 .savedTitle(req.savedTitle())
                 .build();
 
-        Library saved = libraryRepository.save(library);
-        return LibraryMapper.toResponse(saved);
+        return LibraryMapper.toResponse(libraryRepository.save(library));
     }
 
     // 내 라이브러리 목록 조회하기
