@@ -53,8 +53,10 @@ public class RewriteController {
         AiRewriteResult result = rewriteRunner.run(req.prompt());
         System.out.println("RewriteRunner bean = " + rewriteRunner.getClass().getName());
 
+        Long rewriteResultId = rewriteResultService.createDraft(userId, req.prompt(), result);
 
         return ResponseEntity.ok(new RewritePreviewResponse(
+                rewriteResultId,
                 result.rewrittenContent(),
                 result.latencyMs(),
                 result.modelName(),
