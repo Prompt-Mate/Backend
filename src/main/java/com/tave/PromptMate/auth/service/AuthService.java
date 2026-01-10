@@ -2,18 +2,28 @@ package com.tave.PromptMate.auth.service;
 
 import com.tave.PromptMate.auth.client.KakaoApiClient;
 import com.tave.PromptMate.auth.converter.AuthConverter;
+import com.tave.PromptMate.auth.dto.request.CustomUserDetails;
+import com.tave.PromptMate.auth.dto.request.LoginRequest;
+import com.tave.PromptMate.auth.dto.request.SignUpRequest;
 import com.tave.PromptMate.auth.dto.response.JwtLoginResponse;
 import com.tave.PromptMate.auth.dto.response.KakaoUserInfo;
+import com.tave.PromptMate.auth.dto.response.LoginResponse;
+import com.tave.PromptMate.domain.AuthProvider;
+import com.tave.PromptMate.domain.Role;
 import com.tave.PromptMate.domain.User;
+import com.tave.PromptMate.redis.entity.RefreshToken;
 import com.tave.PromptMate.redis.service.RefreshTokenRedisService;
 import com.tave.PromptMate.repository.UserRepository;
 import com.tave.PromptMate.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -25,6 +35,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final KakaoApiClient kakaoApiClient;
     private final RefreshTokenRedisService refreshTokenRedisService;
+    private final BCryptPasswordEncoder passwordEncoder;  // 주입
 
     @Value("${jwt.expiration.access}")
     private Long ACCESS_TOKEN_EXPIRE_TIME;
@@ -32,6 +43,7 @@ public class AuthService {
     @Value("${jwt.expiration.refresh}")
     private Long REFRESH_TOKEN_EXPIRE_TIME;
 
+    //카카오로그인
     public JwtLoginResponse loginOrRegister(String code){
 
         //1. 인가 코드로 카카오 access token 요청
@@ -49,6 +61,7 @@ public class AuthService {
                     return userRepository.save(User.builder()
                                     .email(email)
                                     .nickname(nicknameToUse)
+                                    .authProvider(AuthProvider.KAKAO)
                                     .imageUrl(profileImage)
                             .build());
                 });
@@ -70,5 +83,83 @@ public class AuthService {
     //닉네임 랜덤 생성
     private String generateRandomNickname() {
         return "user_" + UUID.randomUUID().toString().substring(0, 8);
+    }
+
+    //백엔드 확인용
+    public String reissueAccessToken(String refreshToken) throws Exception {
+
+        // refreshToken 유효성 검사
+        if (jwtUtil.isExpired(refreshToken)) {
+            throw new Exception("유효하지 않은 토큰입니다.");
+        }
+
+        // refreshToken에서 userId 추출
+        String userId = jwtUtil.getSubject(refreshToken);
+
+        // redis에서 refreshToken 검증
+        Optional<RefreshToken> optionalRefresh = refreshTokenRedisService.findRefreshToken(Long.parseLong(userId));
+
+        if (optionalRefresh.isEmpty() || !optionalRefresh.get().getRefreshToken().equals(refreshToken)) {
+            throw new Exception("로그인이 만료되었습니다. 다시 로그인해주세요.");
+        }
+
+        // 새 access token 생성
+        Authentication authentication = jwtUtil.getAuthenticationFromUserId(userId);
+        return jwtUtil.generateAccessToken(authentication, userId);
+    }
+
+    //서비스 자체 회원가입
+    public void signUp(SignUpRequest request) {
+
+        //이메일 중복 체크
+        if (userRepository.existsByEmail(request.getEmail())){
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+        }
+
+        User user=User.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .nickname(generateRandomNickname())
+                .authProvider(AuthProvider.LOCAL)
+                .role(Role.USER)
+                .build();
+
+        userRepository.save(user);
+    }
+
+    public LoginResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계정입니다."));
+
+        // 비밀번호 검증
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 토큰 생성
+        Authentication authentication = createAuthentication(user);
+        String userId = String.valueOf(user.getId());
+
+        String accessToken = jwtUtil.generateAccessToken(authentication, userId);
+        String refreshToken = jwtUtil.generateRefreshToken(authentication, userId);
+
+        // Redis에 Refresh Token 저장
+        refreshTokenRedisService.saveRefreshToken(user.getId(), refreshToken,REFRESH_TOKEN_EXPIRE_TIME);
+
+        return LoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .userId(user.getId())
+                .nickname(user.getNickname())
+                .build();
+    }
+
+    private Authentication createAuthentication(User user) {
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+        return new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
+
     }
 }

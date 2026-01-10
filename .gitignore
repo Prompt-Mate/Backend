@@ -49,3 +49,4 @@ src/main/resources/application-*.yaml
 application-jwt.yml
 application-oauth.yml
 
+.env

@@ -12,6 +12,8 @@ public class LibraryMapper {
                 e.getRewriteResult().getId(),
                 e.getSavedTitle(),
                 e.getRewriteResult().getContent(),
+                e.getPlatform(),
+                e.getCategory(),
                 e.getCreatedAt()
         );
     }

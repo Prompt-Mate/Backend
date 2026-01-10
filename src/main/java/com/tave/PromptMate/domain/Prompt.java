@@ -47,6 +47,10 @@ public class Prompt {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "is_private", nullable = false)
+    private Boolean isPrivate = false;
+
+
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -61,6 +65,7 @@ public class Prompt {
     public void softDelete() { this.deleted = true; }
 
     public boolean isDeleted() { return deleted; }
+
 
 
 }

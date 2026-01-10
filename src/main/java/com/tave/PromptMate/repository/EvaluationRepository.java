@@ -3,7 +3,7 @@ package com.tave.PromptMate.repository;
 import com.tave.PromptMate.domain.Evaluation;
 import com.tave.PromptMate.domain.Prompt;
 import com.tave.PromptMate.domain.RewriteResult;
-import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,26 +34,27 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Long> {
 
    // 프롬프트별 평균 점수
    @Query("""
-    SELECT 
-        AVG(e.clarity),
-        AVG(e.specificity),
-        AVG(e.context),
-        AVG(e.creativity),
-        AVG(e.totalScore)
-    FROM Evaluation e
-    WHERE e.prompt.id = :promptId
-""")
+        select 
+            avg(e.clarityScore),
+            avg(e.specificityScore),
+            avg(e.structureScore),
+            avg(e.languageScore),
+            avg(e.consistencyScore),
+            avg(e.overallScore)
+        from Evaluation e
+        where e.prompt.id = :promptId
+    """)
    Object[] avgByPromptId(@Param("promptId") Long promptId);
 
 
-   // 프롬프트별 가장 최근 평가 1건
-   @Query("""
+
+    // 프롬프트별 가장 최근 평가 1건
+    @Query("""
         select e from Evaluation e
         where e.prompt.id = :promptId
         order by e.id desc
     """)
-   Page<Evaluation> findLatestOneByPromptId(@Param("promptId") Long promptId, Pageable pageable);
-
+    Page<Evaluation> findLatestOneByPromptId(@Param("promptId") Long promptId, Pageable pageable);
 
 
     // 프롬프트 최신 1건 (요약/하이라이트 카드용)

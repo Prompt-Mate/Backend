@@ -1,3 +1,7 @@
+server:
+  address: 0.0.0.0
+  port: 8080
+
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL}
@@ -35,3 +39,8 @@ kakao:
     redirect_uri: ${KAKAO_REDIRECT_URI}
     token-uri: https://kauth.kakao.com/oauth/token
     user-info-uri: https://kapi.kakao.com/v2/user/me
+    frontend-redirect-uri: ${KAKAO_FRONTEND_REDIRECT_URI}
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY}

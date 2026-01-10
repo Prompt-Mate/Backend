@@ -31,8 +31,18 @@ public class Library {
     @JoinColumn(name = "rewrite_result_id", nullable = false)
     private RewriteResult rewriteResult;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="community_id",nullable = true)
+    private Community community;
+
     @Column(name = "saved_title", length = 200)
     private String savedTitle;
+
+    @Column(name = "platform", length = 30, nullable = false)
+    private String platform;
+
+    @Column(name = "category", length = 30, nullable = false)
+    private String category;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -41,4 +51,5 @@ public class Library {
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+
 }

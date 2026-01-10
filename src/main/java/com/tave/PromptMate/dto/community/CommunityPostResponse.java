@@ -14,5 +14,9 @@ public record CommunityPostResponse(
         String title,
         String promptContent,
         Visibility visibility,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        long viewCount,
+        long likeCount,
+        long commentCount,
+        boolean isLiked
 ) {}
