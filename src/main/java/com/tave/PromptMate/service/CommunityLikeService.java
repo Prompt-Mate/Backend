@@ -74,4 +74,9 @@ public class CommunityLikeService {
         if (userId == null) return false;
         return communityLikeRepository.existsByUserIdAndCommunityId(userId, communityId);
     }
+
+    @Transactional
+    public void deleteAllByPostId(Long communityId){
+        communityLikeRepository.deleteByCommunityId(communityId);
+    }
 }
