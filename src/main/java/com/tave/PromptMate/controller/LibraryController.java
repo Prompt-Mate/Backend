@@ -1,11 +1,13 @@
 package com.tave.PromptMate.controller;
 
 import com.tave.PromptMate.auth.dto.request.CustomUserDetails;
+import com.tave.PromptMate.dto.community.CommunityPostResponse;
 import com.tave.PromptMate.dto.library.CreateLibraryRequest;
 import com.tave.PromptMate.dto.library.LibraryResponse;
 import com.tave.PromptMate.service.LibraryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -33,22 +35,82 @@ public class LibraryController {
     }
 
     // 내 라이브러리 목록 조회
-    @GetMapping("/my/{userId}")
-    public ResponseEntity<List<LibraryResponse>> myList(@PathVariable Long userId){
-        return ResponseEntity.ok(libraryService.getMyLibraries(userId));
+    @GetMapping("/my")
+    public ResponseEntity<Page<LibraryResponse>> myList(
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size
+    ){
+        Long userId = principal.getUserId();
+        return ResponseEntity.ok(libraryService.getMyLibraries(userId, page, size));
     }
 
     // 단건 조회
-    @GetMapping("/{id}/users/{userId}")
-    public ResponseEntity<LibraryResponse> getOne(@PathVariable Long id, @PathVariable Long userId) {
+    @GetMapping("/{id}")
+    public ResponseEntity<LibraryResponse> getOne(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+
+        Long userId = principal.getUserId();
         return ResponseEntity.ok(libraryService.getOne(id, userId));
     }
 
     // 삭제
-    @DeleteMapping("/{id}/users/{userId}")
-    public ResponseEntity<Void> delete(@PathVariable Long id, @PathVariable Long userId) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails principal) {
+
+        Long userId = principal.getUserId();
         libraryService.delete(id, userId);
         return ResponseEntity.noContent().build();
+    }
+
+    //내가 작성한 게시글 삭제
+    @DeleteMapping("/my-posts/{postId}")
+    public ResponseEntity<Void> deletePost(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal CustomUserDetails principal){
+
+        Long userId = principal.getUserId();
+        libraryService.deletePost(postId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    //내가 작성한 게시글 조회
+    @GetMapping("/my-posts")
+    public ResponseEntity<List<CommunityPostResponse>> getMyPosts(
+            @AuthenticationPrincipal CustomUserDetails principal){
+
+        Long userId = principal.getUserId();
+        return ResponseEntity.ok(libraryService.getMyPosts(userId));
+    }
+
+    //좋아요한 프롬프트 조회
+    @GetMapping("/liked")
+    public ResponseEntity<Page<CommunityPostResponse>> likedList(
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size){
+
+        Long userId = principal.getUserId();
+        return ResponseEntity.ok(libraryService.getLikedPosts(userId, page, size));
+    }
+
+    //검색(태그, 키워드 기반)
+    @GetMapping("/search")
+    public ResponseEntity<Page<LibraryResponse>> search(
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String platform,
+            @RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size){
+
+        Long userId = principal.getUserId();
+        return ResponseEntity.ok(
+                libraryService.searchMyLibraries(userId, keyword, platform, category, page, size)
+        );
     }
 }
 
