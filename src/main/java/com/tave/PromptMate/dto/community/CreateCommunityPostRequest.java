@@ -7,9 +7,6 @@ import jakarta.validation.constraints.NotNull;
 public record CreateCommunityPostRequest(
 
         @NotNull
-        Long categoryId,
-
-        @NotNull
         Long rewriteResultId,
 
         @NotBlank

@@ -9,14 +9,15 @@ public record CommunityPostRow(
         Long rewriteResultId,
         Long userId,
         String nickname,
-        Long categoryId,
-        String categoryName,
         String title,
         String promptContent,
         Visibility visibility,
+        String description,
         LocalDateTime createdAt,
         long viewCount,
         long likeCount,
         long commentCount,
-        boolean isLiked
+        boolean isLiked,
+        String platform,
+        String category
 ) {}

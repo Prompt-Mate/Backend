@@ -36,15 +36,13 @@ public class LibraryService {
         RewriteResult result = rewriteResultRepository.findById(req.rewriteResultId())
                 .orElseThrow(() -> new NotFoundException("rewrite result not found: " + req.rewriteResultId()));
 
-        if(result.getPrompt()==null){
-            throw new IllegalStateException("rewriteResult.prompt 가 null 입니다. createDraft 저장 로직에서 prompt 연결을 확인하세요. id=" + result.getId());
-        }
 
         Library library = Library.builder()
                 .user(user)
-                .prompt(result.getPrompt())
                 .rewriteResult(result)
                 .savedTitle(req.savedTitle())
+                .platform(req.platform())
+                .category(req.category())
                 .build();
 
         return LibraryMapper.toResponse(libraryRepository.save(library));
