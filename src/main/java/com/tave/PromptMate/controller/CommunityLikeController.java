@@ -10,18 +10,18 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/communities")
+@RequestMapping("/api/community/posts")
 public class CommunityLikeController {
 
     private final CommunityLikeService communityLikeService;
 
-    @PostMapping("/{communityId}/likes")
+    @PostMapping("/{postId}/likes")
     public ResponseEntity<CommunityLikeToggleResponse> toggleLike(
-            @PathVariable Long communityId,
+            @PathVariable Long postId,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         CommunityLikeToggleResponse response =
-                communityLikeService.toggleLike(communityId, userDetails.getUserId());
+                communityLikeService.toggleLike(postId, userDetails.getUserId());
         return ResponseEntity.ok(response);
     }
 }
