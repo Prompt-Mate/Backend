@@ -8,10 +8,11 @@ public class LibraryMapper {
         return new LibraryResponse(
                 e.getId(),
                 e.getUser().getId(),
-                e.getPrompt().getId(),
                 e.getRewriteResult().getId(),
                 e.getSavedTitle(),
                 e.getRewriteResult().getContent(),
+                e.getPlatform(),
+                e.getCategory(),
                 e.getCreatedAt()
         );
     }

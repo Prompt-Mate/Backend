@@ -1,17 +1,19 @@
 package com.tave.PromptMate.dto.community;
 
-import com.tave.PromptMate.domain.Community;
+import com.tave.PromptMate.domain.Community.Visibility;
 
-public record CommunityPostResponse(
+import java.time.LocalDateTime;
+
+public record CommunityPostRow(
         Long id,
         Long rewriteResultId,
         Long userId,
         String nickname,
         String title,
         String promptContent,
+        Visibility visibility,
         String description,
-        Community.Visibility visibility,
-        java.time.LocalDateTime createdAt,
+        LocalDateTime createdAt,
         long viewCount,
         long likeCount,
         long commentCount,
