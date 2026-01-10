@@ -7,10 +7,10 @@ import com.tave.PromptMate.dto.library.LibraryResponse;
 import com.tave.PromptMate.service.LibraryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import java.net.URI;
 import java.util.List;
 
@@ -37,10 +37,17 @@ public class LibraryController {
 
     // 내 라이브러리 목록 조회
     @GetMapping("/my")
-    public ResponseEntity<List<LibraryResponse>> myList(@AuthenticationPrincipal CustomUserDetails principal){
+    public ResponseEntity<Page<LibraryResponse>> myList(
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String platform,
+            @RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size
+    ){
 
         Long userId=principal.getUserId();
-        return ResponseEntity.ok(libraryService.getMyLibraries(userId));
+        return ResponseEntity.ok(libraryService.searchMyLibraries(userId,keyword,platform,category,page,size));
     }
 
     // 단건 조회
@@ -83,5 +90,16 @@ public class LibraryController {
         List<CommunityPostResponse> responses=libraryService.getMyPosts(userId);
 
         return ResponseEntity.ok(responses);
+    }
+
+    //좋아요한 프롬프트 조회
+    @GetMapping("/liked")
+    public ResponseEntity<Page<CommunityPostResponse>> likedList(
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size
+    ){
+        Long userId=principal.getUserId();
+        return ResponseEntity.ok(libraryService.getLikedPosts(userId,page,size));
     }
 }
