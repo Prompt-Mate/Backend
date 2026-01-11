@@ -4,5 +4,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record CreateLibraryRequest(
         @NotNull Long rewriteResultId,
-        String savedTitle
+        String savedTitle,
+        @NotNull String platform,
+        @NotNull String category
 ) {}

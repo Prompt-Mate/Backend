@@ -9,5 +9,7 @@ public record LibraryResponse(
         Long rewriteResultId,
         String savedTitle,
         String content,
+        String platform,
+        String category,
         LocalDateTime createdAt
 ) {}
