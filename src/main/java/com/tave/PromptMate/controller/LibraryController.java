@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
 import java.net.URI;
 import java.util.List;
 
@@ -26,10 +27,8 @@ public class LibraryController {
     public ResponseEntity<LibraryResponse> save(
             @AuthenticationPrincipal CustomUserDetails principal,
             @Valid @RequestBody CreateLibraryRequest req){
-
-        Long userId=principal.getUserId();
-
-        LibraryResponse res = libraryService.save(req, userId);
+       Long userId= principal.getUserId();
+       LibraryResponse res=libraryService.save(userId,req);
 
         return ResponseEntity.created(URI.create("/api/libraries/" + res.id()))
                 .body(res);
@@ -42,51 +41,49 @@ public class LibraryController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size
     ){
-
-        Long userId=principal.getUserId();
-        return ResponseEntity.ok(libraryService.getMyLibraries(userId,page,size));
+        Long userId = principal.getUserId();
+        return ResponseEntity.ok(libraryService.getMyLibraries(userId, page, size));
     }
 
     // 단건 조회
     @GetMapping("/{id}")
-    public ResponseEntity<LibraryResponse> getOne(@PathVariable Long id,
-                                                  @AuthenticationPrincipal CustomUserDetails principal) {
+    public ResponseEntity<LibraryResponse> getOne(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails principal) {
 
-        Long userId= principal.getUserId();
-
+        Long userId = principal.getUserId();
         return ResponseEntity.ok(libraryService.getOne(id, userId));
     }
 
     // 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id,  @AuthenticationPrincipal CustomUserDetails principal) {
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails principal) {
 
-        Long userId= principal.getUserId();
-
+        Long userId = principal.getUserId();
         libraryService.delete(id, userId);
         return ResponseEntity.noContent().build();
     }
 
     //내가 작성한 게시글 삭제
     @DeleteMapping("/my-posts/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long postId, @AuthenticationPrincipal CustomUserDetails principal){
-        Long userId=principal.getUserId();
+    public ResponseEntity<Void> deletePost(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal CustomUserDetails principal){
 
-        libraryService.deletePost(postId,userId);
-
+        Long userId = principal.getUserId();
+        libraryService.deletePost(postId, userId);
         return ResponseEntity.noContent().build();
     }
 
     //내가 작성한 게시글 조회
     @GetMapping("/my-posts")
-    public ResponseEntity<List<CommunityPostResponse>>getMyPosts(
-            @AuthenticationPrincipal CustomUserDetails principal
-            ){
-        Long userId=principal.getUserId();
+    public ResponseEntity<List<CommunityPostResponse>> getMyPosts(
+            @AuthenticationPrincipal CustomUserDetails principal){
 
-        List<CommunityPostResponse> responses=libraryService.getMyPosts(userId);
-
-        return ResponseEntity.ok(responses);
+        Long userId = principal.getUserId();
+        return ResponseEntity.ok(libraryService.getMyPosts(userId));
     }
 
     //좋아요한 프롬프트 조회
@@ -94,10 +91,10 @@ public class LibraryController {
     public ResponseEntity<Page<CommunityPostResponse>> likedList(
             @AuthenticationPrincipal CustomUserDetails principal,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size
-    ){
-        Long userId=principal.getUserId();
-        return ResponseEntity.ok(libraryService.getLikedPosts(userId,page,size));
+            @RequestParam(defaultValue = "12") int size){
+
+        Long userId = principal.getUserId();
+        return ResponseEntity.ok(libraryService.getLikedPosts(userId, page, size));
     }
 
     //검색(태그, 키워드 기반)
@@ -108,14 +105,12 @@ public class LibraryController {
             @RequestParam(required = false) String platform,
             @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size
-    ){
+            @RequestParam(defaultValue = "12") int size){
+
         Long userId = principal.getUserId();
         return ResponseEntity.ok(
-                libraryService.searchMyLibraries(
-                        userId, keyword, platform, category, page, size
-                )
+                libraryService.searchMyLibraries(userId, keyword, platform, category, page, size)
         );
     }
-
 }
+

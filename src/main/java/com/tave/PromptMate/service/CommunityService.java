@@ -17,9 +17,6 @@ public class CommunityService {
 
     private final CommunityRepository communityRepository;
     private final UserRepository userRepository;
-    private final RewriteResultRepository rewriteResultRepository;
-    private final PromptRepository promptRepository;
-    private final CategoryRepository categoryRepository;
     private final LibraryRepository libraryRepository;
     private final CommentRepository commentRepository;
     private final CommunityLikeService communityLikeService;
@@ -29,41 +26,28 @@ public class CommunityService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 사용자입니다. id=" + userId));
 
-        Category category = categoryRepository.findById(req.categoryId())
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 카테고리입니다. id=" + req.categoryId()));
+        Library lib=libraryRepository.findByUser_IdAndRewriteResult_Id(userId, req.rewriteResultId())
+                .orElseThrow(()->new NotFoundException( "라이브러리에 저장되지 않은 rewriteResult 입니다. rewriteResultId=" + req.rewriteResultId()));
 
-        // 1) 리라이팅 결과 조회
-        RewriteResult rewriteResult= rewriteResultRepository.findById(req.rewriteResultId())
-                .orElseThrow(()->new NotFoundException("존재하지 않는 리라이팅 결과입니다. id="+req.rewriteResultId()));
-
-        Prompt prompt = rewriteResult.getPrompt();
-
-        // 2) 글 작성 시 프롬프트 내용=리라이팅 결과
+        RewriteResult rewriteResult=lib.getRewriteResult();
         String promptContent= rewriteResult.getContent();
 
-
-        // 3) 커뮤니티 엔티티 생성
         Community community = Community.create(
                 user,
-                prompt,
                 rewriteResult,
-                category,
                 req.title(),
                 req.description(),
                 promptContent,
-                req.visibility()
+                req.visibility(),
+                lib.getPlatform(),
+                lib.getCategory()
         );
 
         Community savedCommunity = communityRepository.save(community);
 
-        Library library = Library.builder()
-                .user(user)
-                .prompt(prompt)
-                .rewriteResult(rewriteResult)
-                .community(savedCommunity)
-                .savedTitle(req.title())  // 커뮤니티 글 제목을 라이브러리 제목으로 사용
-                .build();
-        libraryRepository.save(library);
+        lib.attachCommunityAndUpdateTitle(savedCommunity, req.title());
+        libraryRepository.save(lib);
+
 
         long likeCount= 0L;
         long commentCount=0L;
@@ -130,16 +114,17 @@ public class CommunityService {
                         r.rewriteResultId(),
                         r.userId(),
                         r.nickname(),
-                        r.categoryId(),
-                        r.categoryName(),
                         r.title(),
                         r.promptContent(),
+                        r.description(),
                         r.visibility(),
                         r.createdAt(),
                         r.viewCount(),
                         r.likeCount(),
                         r.commentCount(),
-                        r.isLiked()
+                        r.isLiked(),
+                        r.platform(),
+                        r.category()
                 ))
                 .toList();
     }
