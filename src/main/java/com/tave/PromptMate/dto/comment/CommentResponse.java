@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record CommentResponse(
-        Long id,
-        Long communityId,
+        Long commentId,
+        Long postId,
         Long userId,
         String nickname,
         Long parentId,
