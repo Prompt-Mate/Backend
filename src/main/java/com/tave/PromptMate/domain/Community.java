@@ -26,16 +26,8 @@ public class Community extends BaseTimeEntity{
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "prompt_id", nullable = false)
-    private Prompt prompt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rewrite_result_id", nullable = false)
     private RewriteResult rewriteResult;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -53,26 +45,32 @@ public class Community extends BaseTimeEntity{
     @Column(name = "view_count", nullable = false)
     private long viewCount=0L;
 
+    @Column(name = "platform", length = 30, nullable = false)
+    private String platform;
+
+    @Column(name = "category", length = 30, nullable = false)
+    private String category;
+
 
     public static Community create(
             User user,
-            Prompt prompt,
             RewriteResult rewriteResult,
-            Category category,
             String  title,
             String description,
             String promptContent,
-            Visibility visibility
+            Visibility visibility,
+            String platform,
+            String category
     ){
         Community community=new Community();
         community.user=user;
-        community.prompt = prompt;
         community.rewriteResult=rewriteResult;
-        community.category=category;
         community.title=title;
         community.description=description;
         community.promptContent=promptContent;
         community.visibility=visibility;
+        community.platform=platform;
+        community.category=category;
         return community;
     }
 

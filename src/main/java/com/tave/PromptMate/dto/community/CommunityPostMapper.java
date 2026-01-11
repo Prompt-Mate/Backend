@@ -16,17 +16,17 @@ public class CommunityPostMapper {
                 rewriteResult.getId(),
                 community.getUser().getId(),
                 community.getUser().getNickname(),
-                community.getCategory().getId(),
-                community.getCategory().getName(),
                 community.getTitle(),
                 rewriteResult.getContent(),
+                community.getDescription(),
                 community.getVisibility(),
                 community.getCreatedAt(),
                 community.getViewCount(),
                 likeCount,
                 commentCount,
-                isLiked
-
+                isLiked,
+                community.getPlatform(),
+                community.getCategory()
         );
     }
 }

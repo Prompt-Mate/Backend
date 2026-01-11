@@ -20,63 +20,63 @@ public class CommunityLikeService {
     private final CommunityLikeRepository communityLikeRepository;
 
     @Transactional
-    public CommunityLikeToggleResponse toggleLike(Long communityId, Long userId) {
+    public CommunityLikeToggleResponse toggleLike(Long postId, Long userId) {
 
-        Community community = communityRepository.findById(communityId)
+        Community community = communityRepository.findById(postId)
                 .orElseThrow(() -> new IllegalStateException("게시글이 존재하지 않습니다."));
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("사용자가 존재하지 않습니다."));
 
         boolean alreadyLiked =
-                communityLikeRepository.existsByUserIdAndCommunityId(userId, communityId);
+                communityLikeRepository.existsByUserIdAndCommunityId(userId, postId);
 
         if (alreadyLiked) {
-            communityLikeRepository.deleteByUserIdAndCommunityId(userId, communityId);
+            communityLikeRepository.deleteByUserIdAndCommunityId(userId, postId);
         } else {
             communityLikeRepository.save(CommunityLike.of(user, community));
         }
 
-        long likeCount = communityLikeRepository.countByCommunityId(communityId);
+        long likeCount = communityLikeRepository.countByCommunityId(postId);
         return new CommunityLikeToggleResponse(!alreadyLiked, likeCount);
     }
 
     @Transactional
-    public void like(Long communityId, Long userId) {
+    public void like(Long postId, Long userId) {
 
-        Community community = communityRepository.findById(communityId)
+        Community community = communityRepository.findById(postId)
                 .orElseThrow(() -> new IllegalStateException("게시글이 존재하지 않습니다."));
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("사용자가 존재하지 않습니다."));
 
-        if (communityLikeRepository.existsByUserIdAndCommunityId(userId, communityId)) {
+        if (communityLikeRepository.existsByUserIdAndCommunityId(userId, postId)) {
             return;
         }
         communityLikeRepository.save(CommunityLike.of(user, community));
     }
 
     @Transactional
-    public void unlike(Long communityId, Long userId) {
-        if (!communityLikeRepository.existsByUserIdAndCommunityId(userId, communityId)) {
+    public void unlike(Long postId, Long userId) {
+        if (!communityLikeRepository.existsByUserIdAndCommunityId(userId, postId)) {
             return;
         }
-        communityLikeRepository.deleteByUserIdAndCommunityId(userId, communityId);
+        communityLikeRepository.deleteByUserIdAndCommunityId(userId, postId);
     }
 
     @Transactional(readOnly = true)
-    public long getLikeCount(Long communityId) {
-        return communityLikeRepository.countByCommunityId(communityId);
+    public long getLikeCount(Long postId) {
+        return communityLikeRepository.countByCommunityId(postId);
     }
 
     @Transactional(readOnly = true)
-    public boolean isLiked(Long communityId, Long userId) {
+    public boolean isLiked(Long postId, Long userId) {
         if (userId == null) return false;
-        return communityLikeRepository.existsByUserIdAndCommunityId(userId, communityId);
+        return communityLikeRepository.existsByUserIdAndCommunityId(userId, postId);
     }
 
     @Transactional
-    public void deleteAllByPostId(Long communityId){
-        communityLikeRepository.deleteByCommunityId(communityId);
+    public void deleteAllByPostId(Long postId){
+        communityLikeRepository.deleteByCommunityId(postId);
     }
 }
