@@ -26,7 +26,7 @@ public class Community extends BaseTimeEntity{
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rewrite_result_id", nullable = false)
+    @JoinColumn(name = "rewrite_result_id", nullable = true)
     private RewriteResult rewriteResult;
 
     @Column(name = "title", nullable = false)
