@@ -43,9 +43,19 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     join c.rewriteResult rr
     join c.user u
     where c.visibility <> com.tave.PromptMate.domain.Community.Visibility.REMOVED
+      and (:q is null
+           or c.title like concat('%', :q, '%')
+           or c.promptContent like concat('%', :q, '%'))
+      and (:platform is null or c.platform = :platform)
+      and (:category is null or c.category = :category)
     order by c.createdAt desc
-""")
-    List<CommunityPostRow> findAllLatest(@Param("userId") Long userId);
+    """)
+    List<CommunityPostRow> findAllLatest(
+            @Param("q") String q,
+            @Param("platform") String platform,
+            @Param("category") String category,
+            @Param("userId") Long userId
+    );
 
     // 2) 조회순
     @Query("""
@@ -73,9 +83,19 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     join c.rewriteResult rr
     join c.user u
     where c.visibility <> com.tave.PromptMate.domain.Community.Visibility.REMOVED
+      and (:q is null
+           or c.title like concat('%', :q, '%')
+           or c.promptContent like concat('%', :q, '%'))
+      and (:platform is null or c.platform = :platform)
+      and (:category is null or c.category = :category)
     order by c.viewCount desc, c.createdAt desc
-""")
-    List<CommunityPostRow> findAllView(@Param("userId") Long userId);
+    """)
+    List<CommunityPostRow> findAllView(
+            @Param("q") String q,
+            @Param("platform") String platform,
+            @Param("category") String category,
+            @Param("userId") Long userId
+    );
 
     // 3) 좋아요순
     @Query("""
@@ -103,10 +123,20 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     join c.rewriteResult rr
     join c.user u
     where c.visibility <> com.tave.PromptMate.domain.Community.Visibility.REMOVED
+      and (:q is null
+           or c.title like concat('%', :q, '%')
+           or c.promptContent like concat('%', :q, '%'))
+      and (:platform is null or c.platform = :platform)
+      and (:category is null or c.category = :category)
     order by
         (select count(cl) from CommunityLike cl where cl.community.id = c.id) desc,
         c.createdAt desc
-""")
-    List<CommunityPostRow> findAllLike(@Param("userId") Long userId);
+    """)
+    List<CommunityPostRow> findAllLike(
+            @Param("q") String q,
+            @Param("platform") String platform,
+            @Param("category") String category,
+            @Param("userId") Long userId
+    );
 
 }
