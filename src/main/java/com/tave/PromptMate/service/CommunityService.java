@@ -102,7 +102,7 @@ public class CommunityService {
         String keyword = (q == null || q.isBlank()) ? null : q.trim();
         String p = (platform==null || platform.isBlank()) ? null: platform.trim();
         String c = (category == null || category.isBlank()) ? null : category.trim();
-        String s = (sort == null) ? "latest" : sort;
+        String s = (sort == null||sort.isBlank()) ? "latest" : sort.trim().toLowerCase();
 
         List<CommunityPostRow> rows = switch (s) {
             case "latest" -> communityRepository.findAllLatest(keyword, p, c, userId);
