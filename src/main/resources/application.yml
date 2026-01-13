@@ -9,7 +9,7 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
 
   profiles:
-    include: local, jwt, oauth
+    include: local, jwt, oauth, aws
 
   data:
     redis:
@@ -26,6 +26,11 @@ spring:
         show_sql: true
         format_sql: true
         use_sql_comments: true
+  servlet:
+    multipart:
+      max-file-size: 10MB # 업로드할 수 있는 개별 파일의 최대 크기. 기본 1MB
+      max-request-size: 10MB #multipart/form-data 요청의 최대 허용 크기. 기본 10MB
+
 
 jwt:
   expiration:
@@ -44,3 +49,16 @@ kakao:
 gemini:
   api:
     key: ${GEMINI_API_KEY}
+
+cloud:
+  aws:
+    s3:
+      bucket: promptmate
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    region:
+      static: ${AWS_REGION}
+      auto: false
+    stack:
+      auto: false

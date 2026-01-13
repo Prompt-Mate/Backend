@@ -19,5 +19,6 @@ public record CommunityPostRow(
         long commentCount,
         boolean isLiked,
         String platform,
-        String category
+        String category,
+        String imageUrl
 ) {}

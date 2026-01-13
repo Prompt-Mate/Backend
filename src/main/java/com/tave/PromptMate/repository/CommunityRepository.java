@@ -37,7 +37,8 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
                     where cl2.community.id = c.id and cl2.user.id = :userId) > 0
               then true else false end),
         c.platform,
-        c.category
+        c.category,
+        c.imageUrl
     )
     from Community c
     join c.rewriteResult rr
@@ -77,7 +78,8 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
                     where cl2.community.id = c.id and cl2.user.id = :userId) > 0
               then true else false end),
         c.platform,
-        c.category
+        c.category,
+        c.imageUrl
     )
     from Community c
     join c.rewriteResult rr
@@ -117,7 +119,8 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
                     where cl2.community.id = c.id and cl2.user.id = :userId) > 0
               then true else false end),
         c.platform,
-        c.category
+        c.category,
+        c.imageUrl
     )
     from Community c
     join c.rewriteResult rr

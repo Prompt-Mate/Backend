@@ -40,7 +40,9 @@ public class CommunityService {
                 promptContent,
                 req.visibility(),
                 lib.getPlatform(),
-                lib.getCategory()
+                lib.getCategory(),
+                req.imageUrl()
+
         );
 
         Community savedCommunity = communityRepository.save(community);
@@ -127,7 +129,8 @@ public class CommunityService {
                         r.commentCount(),
                         r.isLiked(),
                         r.platform(),
-                        r.category()
+                        r.category(),
+                        r.imageUrl()
                 ))
                 .toList();
     }

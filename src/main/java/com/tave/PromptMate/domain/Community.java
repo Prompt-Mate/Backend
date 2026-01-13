@@ -51,6 +51,9 @@ public class Community extends BaseTimeEntity{
     @Column(name = "category", length = 30, nullable = false)
     private String category;
 
+    @Column(length=500)
+    private String imageUrl;
+
 
     public static Community create(
             User user,
@@ -60,7 +63,8 @@ public class Community extends BaseTimeEntity{
             String promptContent,
             Visibility visibility,
             String platform,
-            String category
+            String category,
+            String imageUrl
     ){
         Community community=new Community();
         community.user=user;
@@ -71,6 +75,7 @@ public class Community extends BaseTimeEntity{
         community.visibility=visibility;
         community.platform=platform;
         community.category=category;
+        community.imageUrl=imageUrl;
         return community;
     }
 
@@ -82,6 +87,9 @@ public class Community extends BaseTimeEntity{
         this.title=title;
         this.description=description;
         this.visibility=visibility;
+        if (imageUrl != null) {
+            this.imageUrl = imageUrl;
+        }
     }
     public void remove(){
         this.visibility=Visibility.REMOVED;
