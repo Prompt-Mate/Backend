@@ -20,6 +20,7 @@ public class CommunityService {
     private final LibraryRepository libraryRepository;
     private final CommentRepository commentRepository;
     private final CommunityLikeService communityLikeService;
+    private final CommunityRecentService communityRecentService;
 
     public CommunityPostResponse createPost(CreateCommunityPostRequest req, Long userId) {
 
@@ -145,9 +146,13 @@ public class CommunityService {
 
         post.increaseViewCount();
 
+        if(userId!=null){
+            communityRecentService.upsert(userId,postId);
+        }
+
         long likeCount = communityLikeService.getLikeCount(postId);
         long commentCount=commentRepository.countByCommunityId(postId);
-        boolean isLiked = communityLikeService.isLiked(postId, userId);
+        boolean isLiked = (userId != null) && communityLikeService.isLiked(postId, userId);
 
         return CommunityPostMapper.toResponse(post, likeCount, commentCount, isLiked);
     }
