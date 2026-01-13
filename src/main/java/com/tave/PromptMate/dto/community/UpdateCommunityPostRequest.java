@@ -8,5 +8,6 @@ public record UpdateCommunityPostRequest (
     @NotBlank String title,
     @NotBlank String description,
     @NotNull
-    Community.Visibility visibility
+    Community.Visibility visibility,
+    String imageUrl
 ) {}

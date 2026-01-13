@@ -27,6 +27,7 @@ public class CommunityPostMapper {
                 isLiked,
                 community.getPlatform(),
                 community.getCategory()
+                ,community.getImageUrl()
         );
     }
 }

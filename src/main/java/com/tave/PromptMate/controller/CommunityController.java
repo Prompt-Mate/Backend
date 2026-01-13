@@ -1,6 +1,8 @@
 package com.tave.PromptMate.controller;
 
 import com.tave.PromptMate.auth.dto.request.CustomUserDetails;
+import com.tave.PromptMate.common.S3Uploader;
+import com.tave.PromptMate.domain.Community;
 import com.tave.PromptMate.dto.community.CommunityPostMapper;
 import com.tave.PromptMate.dto.community.CommunityPostResponse;
 import com.tave.PromptMate.dto.community.CreateCommunityPostRequest;
@@ -8,10 +10,13 @@ import com.tave.PromptMate.dto.community.UpdateCommunityPostRequest;
 import com.tave.PromptMate.service.CommunityService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -21,14 +26,29 @@ import java.util.List;
 public class CommunityController {
 
     private final CommunityService communityService;
+    private final S3Uploader s3Uploader;
 
     // 커뮤니티 글 작성
-    @PostMapping("/posts")
+    @PostMapping(value="/posts", consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CommunityPostResponse> createPost(
             @AuthenticationPrincipal CustomUserDetails principal,
-            @Valid @RequestBody CreateCommunityPostRequest request
-    ) {
+            @RequestParam("rewriteResultId") Long rewriteResultId,
+            @RequestParam("title") String title,
+            @RequestParam("description") String description,
+            @RequestParam("visibility") Community.Visibility visibility,
+            @RequestPart(value="image" ,required = false) MultipartFile image
+            ) throws IOException {
         Long userId=principal.getUserId();
+
+        // 이미지 업로드
+        String imageUrl = null;
+        if (image != null && !image.isEmpty()) {
+            imageUrl = s3Uploader.uploadImage(image, "community");
+        }
+
+        CreateCommunityPostRequest request = new CreateCommunityPostRequest(
+                rewriteResultId, title, description, visibility,imageUrl
+        );
 
         CommunityPostResponse response = communityService.createPost(request, userId);
 
