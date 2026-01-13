@@ -59,14 +59,17 @@ public class CommunityController {
         return ResponseEntity.noContent().build();
     }
 
-    // 커뮤니티 글 목록 조회(최신순/조회순/좋아요순)
+    // 커뮤니티 글 목록 조회(최신순/조회순/좋아요순), 검색 포함
     @GetMapping("/posts")
     public ResponseEntity<List<CommunityPostResponse>> getPosts(
-            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) String q,
+            @RequestParam(defaultValue = "latest") String sort,
+            @RequestParam(required = false) String platform,
+            @RequestParam(required = false) String category,
             @AuthenticationPrincipal CustomUserDetails principal
     ) {
         Long userId = (principal == null) ? null : principal.getUserId();
-        return ResponseEntity.ok(communityService.getPosts(sort, userId));
+        return ResponseEntity.ok(communityService.getPosts(q, platform, category, sort, userId));
     }
 
     // 커뮤니티 글 단건 조회
@@ -78,5 +81,4 @@ public class CommunityController {
         Long userId = (principal == null) ? null : principal.getUserId();
         return ResponseEntity.ok(communityService.getPost(postId, userId));
     }
-
 }

@@ -95,17 +95,20 @@ public class CommunityService {
         communityRepository.delete(post);
 
     }
-    // 4) 게시글 목록 조회(최신순/조회순/좋아요순)
+    // 게시글 목록 조회(최신순/조회순/좋아요순), 검색포함
     @Transactional(readOnly = true)
-    public List<CommunityPostResponse> getPosts(String sort, Long userId) {
+    public List<CommunityPostResponse> getPosts(String q, String  platform, String category, String sort, Long userId) {
 
-        String s = (sort == null) ? "latest" : sort;
+        String keyword = (q == null || q.isBlank()) ? null : q.trim();
+        String p = (platform==null || platform.isBlank()) ? null: platform.trim();
+        String c = (category == null || category.isBlank()) ? null : category.trim();
+        String s = (sort == null||sort.isBlank()) ? "latest" : sort.trim().toLowerCase();
 
         List<CommunityPostRow> rows = switch (s) {
-            case "latest" -> communityRepository.findAllLatest(userId);
-            case "view" -> communityRepository.findAllView(userId);
-            case "like" -> communityRepository.findAllLike(userId);
-            default -> communityRepository.findAllLatest(userId);
+            case "latest" -> communityRepository.findAllLatest(keyword, p, c, userId);
+            case "view" -> communityRepository.findAllView(keyword, p, c, userId);
+            case "like" -> communityRepository.findAllLike(keyword, p, c, userId);
+            default -> communityRepository.findAllLatest(keyword, p, c, userId);
         };
 
         return rows.stream()
@@ -129,7 +132,7 @@ public class CommunityService {
                 .toList();
     }
 
-    // 5) 게시글 단건 조회
+    // 게시글 단건 조회
     @Transactional
     public CommunityPostResponse getPost(Long postId, Long userId) {
 
@@ -145,4 +148,5 @@ public class CommunityService {
 
         return CommunityPostMapper.toResponse(post, likeCount, commentCount, isLiked);
     }
+
 }
