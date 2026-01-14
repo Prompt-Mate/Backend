@@ -1,6 +1,8 @@
 package com.tave.PromptMate.dto.community;
 
 import com.tave.PromptMate.domain.Community;
+import com.tave.PromptMate.domain.Platform;
+import com.tave.PromptMate.domain.PromptCategory;
 
 public record CommunityPostResponse(
         Long id,
@@ -16,7 +18,7 @@ public record CommunityPostResponse(
         long likeCount,
         long commentCount,
         boolean isLiked,
-        String platform,
-        String category,
+        Platform platform,
+        PromptCategory category,
         String imageUrl
 ) {}

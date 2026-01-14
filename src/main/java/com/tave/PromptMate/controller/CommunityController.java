@@ -3,6 +3,8 @@ package com.tave.PromptMate.controller;
 import com.tave.PromptMate.auth.dto.request.CustomUserDetails;
 import com.tave.PromptMate.common.S3Uploader;
 import com.tave.PromptMate.domain.Community;
+import com.tave.PromptMate.domain.Platform;
+import com.tave.PromptMate.domain.PromptCategory;
 import com.tave.PromptMate.dto.community.CommunityPostMapper;
 import com.tave.PromptMate.dto.community.CommunityPostResponse;
 import com.tave.PromptMate.dto.community.CreateCommunityPostRequest;
@@ -84,12 +86,16 @@ public class CommunityController {
     public ResponseEntity<List<CommunityPostResponse>> getPosts(
             @RequestParam(required = false) String q,
             @RequestParam(defaultValue = "latest") String sort,
-            @RequestParam(required = false) String platform,
-            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Platform platform,
+            @RequestParam(required = false) PromptCategory category,
             @AuthenticationPrincipal CustomUserDetails principal
     ) {
         Long userId = (principal == null) ? null : principal.getUserId();
-        return ResponseEntity.ok(communityService.getPosts(q, platform, category, sort, userId));
+
+        String p = (platform == null) ? null : platform.name();
+        String c = (category == null) ? null : category.name();
+
+        return ResponseEntity.ok(communityService.getPosts(q, p, c, sort, userId));
     }
 
     // 커뮤니티 글 단건 조회
@@ -101,4 +107,5 @@ public class CommunityController {
         Long userId = (principal == null) ? null : principal.getUserId();
         return ResponseEntity.ok(communityService.getPost(postId, userId));
     }
+
 }

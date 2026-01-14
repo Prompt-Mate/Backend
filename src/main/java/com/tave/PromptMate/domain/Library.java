@@ -34,11 +34,13 @@ public class Library {
     @Column(name = "saved_title", length = 200)
     private String savedTitle;
 
-    @Column(name = "platform", length = 30, nullable = false)
-    private String platform;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Platform platform;
 
-    @Column(name = "category", length = 30, nullable = false)
-    private String category;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PromptCategory category;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

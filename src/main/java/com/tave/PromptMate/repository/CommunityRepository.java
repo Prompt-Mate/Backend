@@ -2,6 +2,8 @@ package com.tave.PromptMate.repository;
 
 import com.tave.PromptMate.domain.Community;
 import com.tave.PromptMate.domain.Community.Visibility;
+import com.tave.PromptMate.domain.Platform;
+import com.tave.PromptMate.domain.PromptCategory;
 import com.tave.PromptMate.dto.community.CommunityPostRow;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -53,8 +55,8 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     """)
     List<CommunityPostRow> findAllLatest(
             @Param("q") String q,
-            @Param("platform") String platform,
-            @Param("category") String category,
+            @Param("platform") Platform platform,
+            @Param("category") PromptCategory category,
             @Param("userId") Long userId
     );
 
@@ -94,8 +96,8 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     """)
     List<CommunityPostRow> findAllView(
             @Param("q") String q,
-            @Param("platform") String platform,
-            @Param("category") String category,
+            @Param("platform") Platform platform,
+            @Param("category") PromptCategory category,
             @Param("userId") Long userId
     );
 
@@ -137,8 +139,8 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     """)
     List<CommunityPostRow> findAllLike(
             @Param("q") String q,
-            @Param("platform") String platform,
-            @Param("category") String category,
+            @Param("platform") Platform platform,
+            @Param("category") PromptCategory category,
             @Param("userId") Long userId
     );
 

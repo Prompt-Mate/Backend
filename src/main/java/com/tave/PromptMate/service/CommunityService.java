@@ -102,8 +102,24 @@ public class CommunityService {
     public List<CommunityPostResponse> getPosts(String q, String  platform, String category, String sort, Long userId) {
 
         String keyword = (q == null || q.isBlank()) ? null : q.trim();
-        String p = (platform==null || platform.isBlank()) ? null: platform.trim();
-        String c = (category == null || category.isBlank()) ? null : category.trim();
+
+        Platform p = null;
+        if (platform != null && !platform.isBlank()) {
+            try {
+                p = Platform.valueOf(platform.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("지원하지 않는 플랫폼입니다: " + platform);
+            }
+        }
+        PromptCategory c = null;
+        if (category != null && !category.isBlank()) {
+            try {
+                c = PromptCategory.valueOf(category.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("지원하지 않는 카테고리입니다: " + category);
+            }
+        }
+
         String s = (sort == null||sort.isBlank()) ? "latest" : sort.trim().toLowerCase();
 
         List<CommunityPostRow> rows = switch (s) {
