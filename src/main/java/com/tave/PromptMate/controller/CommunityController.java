@@ -5,10 +5,8 @@ import com.tave.PromptMate.common.S3Uploader;
 import com.tave.PromptMate.domain.Community;
 import com.tave.PromptMate.domain.Platform;
 import com.tave.PromptMate.domain.PromptCategory;
-import com.tave.PromptMate.dto.community.CommunityPostMapper;
-import com.tave.PromptMate.dto.community.CommunityPostResponse;
-import com.tave.PromptMate.dto.community.CreateCommunityPostRequest;
-import com.tave.PromptMate.dto.community.UpdateCommunityPostRequest;
+import com.tave.PromptMate.dto.community.*;
+import com.tave.PromptMate.service.CommunityRecentService;
 import com.tave.PromptMate.service.CommunityService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +27,7 @@ public class CommunityController {
 
     private final CommunityService communityService;
     private final S3Uploader s3Uploader;
+    private final CommunityRecentService communityRecentService;
 
     // 커뮤니티 글 작성
     @PostMapping(value="/posts", consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -107,5 +106,13 @@ public class CommunityController {
         Long userId = (principal == null) ? null : principal.getUserId();
         return ResponseEntity.ok(communityService.getPost(postId, userId));
     }
-
+    // 최근 본 프롬프트
+    @GetMapping("/recent")
+    public ResponseEntity<List<CommunityRecentRow>> getRecentCommunities(
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestParam(defaultValue = "20") int limit
+    ){
+        Long userId= principal.getUserId();
+        return ResponseEntity.ok(communityRecentService.getRecent(userId,limit));
+    }
 }
