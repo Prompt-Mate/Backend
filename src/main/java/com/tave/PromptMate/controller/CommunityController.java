@@ -83,7 +83,7 @@ public class CommunityController {
     // 커뮤니티 글 목록 조회(최신순/조회순/좋아요순), 검색 포함
     @GetMapping("/posts")
     public ResponseEntity<List<CommunityPostResponse>> getPosts(
-            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "latest") String sort,
             @RequestParam(required = false) Platform platform,
             @RequestParam(required = false) PromptCategory category,
@@ -94,7 +94,7 @@ public class CommunityController {
         String p = (platform == null) ? null : platform.name();
         String c = (category == null) ? null : category.name();
 
-        return ResponseEntity.ok(communityService.getPosts(q, p, c, sort, userId));
+        return ResponseEntity.ok(communityService.getPosts(search, p, c, sort, userId));
     }
 
     // 커뮤니티 글 단건 조회
