@@ -28,21 +28,6 @@ public class UserController {
     private final UserService userService;
     private final AuthService authService;
 
-    @PostMapping("/api/user/signup")
-    @Operation(summary = "회원가입", description = "이메일을 통해 회원가입합니다.")
-    public ResponseEntity<String> signUp(@RequestBody SignUpRequest request){
-        authService.signUp(request);
-
-        return ResponseEntity.status(HttpStatus.OK).body("회원가입 완료");
-    }
-
-    @PostMapping("/api/user/login")
-    @Operation(summary = "로그인", description = "회원가입한 이메일을 통해 로그인합니다.")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request){
-        LoginResponse response =authService.login(request);
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
 
 
     @PatchMapping("/nickname")
@@ -55,14 +40,6 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
 
-    }
-
-    @PostMapping("/logout")
-    @Operation(summary = "로그아웃" ,description = "사용자를 로그아웃합니다.")
-    public ResponseEntity<String> logout(@AuthenticationPrincipal CustomUserDetails principal){
-        Long userId=principal.getUserId();
-        String message=userService.logout(userId);
-        return ResponseEntity.ok(message);
     }
 
     @Operation(summary = "회원탈퇴", description = "사용자를 탈퇴합니다.")
