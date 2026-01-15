@@ -115,4 +115,14 @@ public class CommunityController {
         Long userId= principal.getUserId();
         return ResponseEntity.ok(communityRecentService.getRecent(userId,limit));
     }
+
+    // 오늘의 인기 프롬프트
+    @GetMapping("/popular")
+    public ResponseEntity<List<CommunityPostResponse>> popular(
+            @AuthenticationPrincipal CustomUserDetails principal
+    ) {
+        Long userId = (principal == null) ? null : principal.getUserId();
+        return ResponseEntity.ok(communityService.getPopularTop5(userId));
+    }
+
 }
