@@ -47,21 +47,4 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-
-    @PostMapping("/api/auth/signup")
-    @Operation(summary = "회원가입")
-    public ResponseEntity<String> signUp(@RequestBody SignUpRequest request){
-        authService.signUp(request);
-
-        return ResponseEntity.status(HttpStatus.OK).body("회원가입 완료");
-    }
-
-    @PostMapping("/api/auth/login")
-    @Operation(summary = "로그인")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request){
-        LoginResponse response =authService.login(request);
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
 }

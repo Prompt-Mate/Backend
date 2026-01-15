@@ -1,6 +1,10 @@
 package com.tave.PromptMate.controller;
 
 import com.tave.PromptMate.auth.dto.request.CustomUserDetails;
+import com.tave.PromptMate.auth.dto.request.LoginRequest;
+import com.tave.PromptMate.auth.dto.request.SignUpRequest;
+import com.tave.PromptMate.auth.dto.response.LoginResponse;
+import com.tave.PromptMate.auth.service.AuthService;
 import com.tave.PromptMate.dto.user.NicknameRequest;
 import com.tave.PromptMate.dto.user.NicknameResponse;
 import com.tave.PromptMate.service.UserService;
@@ -14,20 +18,32 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.*;
+
 @RestController
 @Tag(name = "사용자 API")
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final AuthService authService;
 
-    @GetMapping("/me")
-    @Operation(summary = "인증된 사용자 확인", description = "로그인한 사용자를 확인합니다.")
-    public ResponseEntity<String> getAuthenticatedUserInfo(@AuthenticationPrincipal CustomUserDetails principal) {
-        Long userId=principal.getUserId();
+    @PostMapping("/api/user/signup")
+    @Operation(summary = "회원가입", description = "이메일을 통해 회원가입합니다.")
+    public ResponseEntity<String> signUp(@RequestBody SignUpRequest request){
+        authService.signUp(request);
 
-        return ResponseEntity.ok("인증된 사용자 ID: " + userId);
+        return ResponseEntity.status(HttpStatus.OK).body("회원가입 완료");
     }
+
+    @PostMapping("/api/user/login")
+    @Operation(summary = "로그인", description = "회원가입한 이메일을 통해 로그인합니다.")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request){
+        LoginResponse response =authService.login(request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
     @PatchMapping("/nickname")
     @Operation(summary = "사용자 닉네임 변경", description = "사용자의 닉네임을 변경합니다.")
@@ -59,8 +75,4 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body("회원 탈퇴 완료");
     }
 
-    @GetMapping("/test")
-    public String home() {
-        return "Hello1";
-    }
 }

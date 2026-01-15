@@ -4,6 +4,8 @@ import com.tave.PromptMate.auth.dto.request.CustomUserDetails;
 import com.tave.PromptMate.common.RewriteRunner;
 import com.tave.PromptMate.dto.rewrite.*;
 import com.tave.PromptMate.service.RewriteResultService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
+@Tag(name="리라이팅 API")
 public class RewriteController {
 
     private final RewriteResultService rewriteResultService;
@@ -41,9 +44,8 @@ public class RewriteController {
         return principal.getUserId();
     }
 
-
-
     @PostMapping("/rewrite")
+    @Operation(summary = "리라이팅 출력", description = "리라이팅된 결과를 출력합니다.")
     public ResponseEntity<RewritePreviewResponse> preview(
             @AuthenticationPrincipal CustomUserDetails principal,
             @Valid @RequestBody RewritePreviewRequest req) {
