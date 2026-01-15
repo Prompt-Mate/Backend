@@ -1,6 +1,8 @@
 package com.tave.PromptMate.repository;
 
 import com.tave.PromptMate.domain.RewriteResult;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -13,4 +15,9 @@ public interface RewriteResultRepository extends JpaRepository<RewriteResult, Lo
 
     // 프롬프트별 전체 리라이팅 (최신순)
     List<RewriteResult> findByPromptIdOrderByCreatedAtDesc(Long promptId);
+
+    Page<RewriteResult> findByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
+
+    Optional<RewriteResult> findTopByUserIdOrderByCreatedAtDesc(Long userId);
+
 }
