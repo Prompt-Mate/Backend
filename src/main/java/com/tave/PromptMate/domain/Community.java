@@ -45,11 +45,13 @@ public class Community extends BaseTimeEntity{
     @Column(name = "view_count", nullable = false)
     private long viewCount=0L;
 
-    @Column(name = "platform", length = 30, nullable = false)
-    private String platform;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "platform", nullable = false, length = 30)
+    private Platform platform;
 
-    @Column(name = "category", length = 30, nullable = false)
-    private String category;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false, length = 30)
+    private PromptCategory category;
 
     @Column(length=500)
     private String imageUrl;
@@ -62,8 +64,8 @@ public class Community extends BaseTimeEntity{
             String description,
             String promptContent,
             Visibility visibility,
-            String platform,
-            String category,
+            Platform platform,
+            PromptCategory category,
             String imageUrl
     ){
         Community community=new Community();

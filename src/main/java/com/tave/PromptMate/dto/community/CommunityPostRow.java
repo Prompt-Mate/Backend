@@ -1,6 +1,8 @@
 package com.tave.PromptMate.dto.community;
 
 import com.tave.PromptMate.domain.Community.Visibility;
+import com.tave.PromptMate.domain.Platform;
+import com.tave.PromptMate.domain.PromptCategory;
 
 import java.time.LocalDateTime;
 
@@ -18,7 +20,7 @@ public record CommunityPostRow(
         long likeCount,
         long commentCount,
         boolean isLiked,
-        String platform,
-        String category,
+        Platform platform,
+        PromptCategory category,
         String imageUrl
 ) {}
