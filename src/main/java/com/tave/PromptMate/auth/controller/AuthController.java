@@ -26,7 +26,7 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/login/kakao")
-    @Operation(summary = "카카오로그인", description = "카카오로그을 인합니다.")
+    @Operation(summary = "카카오로그인", description = "카카오로그인을 합니다.")
     public ResponseEntity<JwtLoginResponse> kakaoLogin(@RequestParam String code){
         JwtLoginResponse jwtLoginResponse= authService.loginOrRegister(code);
 
