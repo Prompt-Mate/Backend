@@ -5,6 +5,8 @@ import com.tave.PromptMate.dto.community.CommunityPostResponse;
 import com.tave.PromptMate.dto.library.CreateLibraryRequest;
 import com.tave.PromptMate.dto.library.LibraryResponse;
 import com.tave.PromptMate.service.LibraryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,12 +20,14 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/libraries")
+@Tag(name="라이브러리 API")
 public class LibraryController {
 
     private final LibraryService libraryService;
 
     // 라이브러리에 리라이팅 결과 저장하기
     @PostMapping
+    @Operation(summary = "리라이팅 결과 저장", description = "리라이팅된 결과를 라이브러리에 저장합니다.")
     public ResponseEntity<LibraryResponse> save(
             @AuthenticationPrincipal CustomUserDetails principal,
             @Valid @RequestBody CreateLibraryRequest req){
@@ -36,6 +40,7 @@ public class LibraryController {
 
     // 내 라이브러리 목록 조회
     @GetMapping("/my")
+    @Operation(summary = "라이브러리 목록 조회", description = "라이브러리 목록을 조회합니다.")
     public ResponseEntity<Page<LibraryResponse>> myList(
             @AuthenticationPrincipal CustomUserDetails principal,
             @RequestParam(defaultValue = "0") int page,
@@ -57,6 +62,7 @@ public class LibraryController {
 
     // 삭제
     @DeleteMapping("/{id}")
+    @Operation(summary = "저장된 프롬프트 삭제", description = "저장한 리라이팅된 프롬프트를 삭제합니다.")
     public ResponseEntity<Void> delete(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails principal) {
@@ -68,6 +74,7 @@ public class LibraryController {
 
     //내가 작성한 게시글 삭제
     @DeleteMapping("/my-posts/{postId}")
+    @Operation(summary = "게시글 삭제", description = "해당 게시글을 삭제합니다.")
     public ResponseEntity<Void> deletePost(
             @PathVariable Long postId,
             @AuthenticationPrincipal CustomUserDetails principal){
@@ -79,6 +86,7 @@ public class LibraryController {
 
     //내가 작성한 게시글 조회
     @GetMapping("/my-posts")
+    @Operation(summary = "작성한 게시글 조회", description = "내가 작성한 게시글들을 조회합니다.")
     public ResponseEntity<List<CommunityPostResponse>> getMyPosts(
             @AuthenticationPrincipal CustomUserDetails principal){
 
@@ -88,6 +96,7 @@ public class LibraryController {
 
     //좋아요한 프롬프트 조회
     @GetMapping("/liked")
+    @Operation(summary = "좋아요한 프롬프트 조회", description = "좋아요 누른 프롬프트들(게시글들)을 조회합니다.")
     public ResponseEntity<Page<CommunityPostResponse>> likedList(
             @AuthenticationPrincipal CustomUserDetails principal,
             @RequestParam(defaultValue = "0") int page,
@@ -99,6 +108,7 @@ public class LibraryController {
 
     //검색(태그, 키워드 기반)
     @GetMapping("/search")
+    @Operation(summary = "라이브러리 검색", description = "태그, 키워드 기반으로 프롬프트들을 검색합니다.")
     public ResponseEntity<Page<LibraryResponse>> search(
             @AuthenticationPrincipal CustomUserDetails principal,
             @RequestParam(required = false) String keyword,

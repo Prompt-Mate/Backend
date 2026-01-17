@@ -8,6 +8,8 @@ import com.tave.PromptMate.domain.PromptCategory;
 import com.tave.PromptMate.dto.community.*;
 import com.tave.PromptMate.service.CommunityRecentService;
 import com.tave.PromptMate.service.CommunityService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -23,6 +25,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/community")
+@Tag(name="커뮤니티 게시글 API")
 public class CommunityController {
 
     private final CommunityService communityService;
@@ -31,6 +34,7 @@ public class CommunityController {
 
     // 커뮤니티 글 작성
     @PostMapping(value="/posts", consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "게시글 작성", description = "게시글 작성 입니다.")
     public ResponseEntity<CommunityPostResponse> createPost(
             @AuthenticationPrincipal CustomUserDetails principal,
             @RequestParam("rewriteResultId") Long rewriteResultId,
@@ -59,6 +63,7 @@ public class CommunityController {
 
     //커뮤니티 글 수정
     @PatchMapping("/posts/{postId}")
+    @Operation(summary = "게시글 수정", description = "해당 게시글을 수정합니다.")
     public ResponseEntity<CommunityPostResponse> updatePost(
             @AuthenticationPrincipal CustomUserDetails principal,
             @PathVariable Long postId,
@@ -71,6 +76,7 @@ public class CommunityController {
 
     //커뮤니티 글 삭제
     @DeleteMapping("/posts/{postId}")
+    @Operation(summary = "게시글 삭제", description = "해당 게시글을 삭제합니다.")
     public ResponseEntity<Void> deletePost(
             @AuthenticationPrincipal CustomUserDetails principal,
             @PathVariable Long postId
@@ -82,6 +88,7 @@ public class CommunityController {
 
     // 커뮤니티 글 목록 조회(최신순/조회순/좋아요순), 검색 포함
     @GetMapping("/posts")
+    @Operation(summary = "게시글 조회", description = "해당 게시글을 (최신순/조회순/좋아요) 순으로 조회합니다. 검색 포함")
     public ResponseEntity<List<CommunityPostResponse>> getPosts(
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "latest") String sort,
@@ -99,6 +106,7 @@ public class CommunityController {
 
     // 커뮤니티 글 단건 조회
     @GetMapping("/posts/{postId}")
+    @Operation(summary = "게시글 상세조회", description = "해당 게시글의 내용,댓글 등을 조회합니다.")
     public ResponseEntity<CommunityPostResponse> getPost(
             @PathVariable Long postId,
             @AuthenticationPrincipal CustomUserDetails principal
@@ -106,8 +114,13 @@ public class CommunityController {
         Long userId = (principal == null) ? null : principal.getUserId();
         return ResponseEntity.ok(communityService.getPost(postId, userId));
     }
+
     // 최근 본 프롬프트
     @GetMapping("/recent")
+    @Operation(
+            summary = "최근 본 프롬프트 조회",
+            description = "사용자가 최근에 조회한 프롬프트 목록을 최신순으로 조회합니다."
+    )
     public ResponseEntity<List<CommunityRecentRow>> getRecentCommunities(
             @AuthenticationPrincipal CustomUserDetails principal,
             @RequestParam(defaultValue = "20") int limit

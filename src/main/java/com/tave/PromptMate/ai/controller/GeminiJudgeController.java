@@ -4,6 +4,7 @@ import com.tave.PromptMate.ai.dto.GeminiJudgeRequest;
 import com.tave.PromptMate.ai.dto.GeminiJudgeResponse;
 import com.tave.PromptMate.ai.service.GeminiJudgeService;
 import com.tave.PromptMate.auth.dto.request.CustomUserDetails;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ public class GeminiJudgeController {
     private final GeminiJudgeService geminiJudgeService;
 
     @PostMapping
+    @Operation(summary = "프롬프트 평가/피드백", description = "Gemini api를 통해 리라이팅 되기 전의 프롬프트에 대한 평가와 피드백을 받습니다.")
     public ResponseEntity<GeminiJudgeResponse> judge(@AuthenticationPrincipal CustomUserDetails principal,
                                                      @RequestBody GeminiJudgeRequest request){
 

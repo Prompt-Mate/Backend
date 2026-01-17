@@ -50,3 +50,5 @@ application-jwt.yml
 application-oauth.yml
 
 .env
+
+CLAUDE.md
