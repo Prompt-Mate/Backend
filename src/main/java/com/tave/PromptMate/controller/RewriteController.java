@@ -6,7 +6,6 @@ import com.tave.PromptMate.dto.rewrite.*;
 import com.tave.PromptMate.service.RewriteResultService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,6 +27,7 @@ public class RewriteController {
     private final RewriteResultService rewriteResultService;
     private final RewriteRunner rewriteRunner;
 
+    @Operation(hidden = true, deprecated = true)
     @GetMapping("/me")
     public ResponseEntity<String> getAuthenticatedUserInfo(
             @AuthenticationPrincipal CustomUserDetails principal) {
@@ -72,6 +72,7 @@ public class RewriteController {
     }
 
     //  내 리라이팅 히스토리(페이징)
+    @Operation(hidden = true, deprecated = true)
     @GetMapping("/rewrite-results/my")
     public ResponseEntity<Page<RewriteHistoryItemResponse>> getMyHistory(
             @AuthenticationPrincipal CustomUserDetails principal,
@@ -83,6 +84,7 @@ public class RewriteController {
     }
 
     //  내 최신 리라이팅 1건
+    @Operation(hidden = true, deprecated = true)
     @GetMapping("/rewrite-results/my/latest")
     public ResponseEntity<RewriteHistoryItemResponse> getMyLatest(
             @AuthenticationPrincipal CustomUserDetails principal
