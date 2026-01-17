@@ -5,6 +5,7 @@ import com.tave.PromptMate.domain.*;
 import com.tave.PromptMate.dto.community.*;
 import com.tave.PromptMate.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -173,4 +174,31 @@ public class CommunityService {
         return CommunityPostMapper.toResponse(post, likeCount, commentCount, isLiked);
     }
 
+    // 홈 - 오늘의 인기 프롬프트
+    @Transactional(readOnly = true)
+    public List<CommunityPostResponse> getPopularTop5(Long userId) {
+        List<CommunityPostRow> rows =
+                communityRepository.findPopularTop(userId, PageRequest.of(0, 5));
+
+        return rows.stream()
+                .map(r -> new CommunityPostResponse(
+                        r.id(),
+                        r.rewriteResultId(),
+                        r.userId(),
+                        r.nickname(),
+                        r.title(),
+                        r.promptContent(),
+                        r.description(),
+                        r.visibility(),
+                        r.createdAt(),
+                        r.viewCount(),
+                        r.likeCount(),
+                        r.commentCount(),
+                        r.isLiked(),
+                        r.platform(),
+                        r.category(),
+                        r.imageUrl()
+                ))
+                .toList();
+    }
 }

@@ -5,6 +5,7 @@ import com.tave.PromptMate.dto.prompt.PromptAutoResponse;
 import com.tave.PromptMate.dto.prompt.PromptResponse;
 import com.tave.PromptMate.dto.prompt.UpdatePromptRequest;
 import com.tave.PromptMate.service.PromptService;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
+@Hidden
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/prompts")
