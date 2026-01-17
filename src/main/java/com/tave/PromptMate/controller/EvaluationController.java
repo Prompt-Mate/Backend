@@ -1,17 +1,19 @@
 package com.tave.PromptMate.controller;
 
+import com.tave.PromptMate.dto.evaluation.AutoEvaluationRequest;
 import com.tave.PromptMate.dto.evaluation.EvaluationResponse;
 import com.tave.PromptMate.dto.evaluation.EvaluationSummaryResponse;
 import com.tave.PromptMate.service.EvaluationService;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.tave.PromptMate.dto.evaluation.AutoEvaluationRequest;
 
 import java.net.URI;
 
+@Hidden
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/evaluations")
