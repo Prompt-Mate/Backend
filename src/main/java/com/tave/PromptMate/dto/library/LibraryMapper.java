@@ -13,6 +13,7 @@ public class LibraryMapper {
                 e.getRewriteResult().getContent(),
                 e.getPlatform(),
                 e.getCategory(),
+                e.getImageUrl(),
                 e.getCreatedAt()
         );
     }

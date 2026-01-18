@@ -1,19 +1,24 @@
 package com.tave.PromptMate.controller;
 
 import com.tave.PromptMate.auth.dto.request.CustomUserDetails;
+import com.tave.PromptMate.common.S3Uploader;
+import com.tave.PromptMate.domain.Platform;
+import com.tave.PromptMate.domain.PromptCategory;
 import com.tave.PromptMate.dto.community.CommunityPostResponse;
 import com.tave.PromptMate.dto.library.CreateLibraryRequest;
 import com.tave.PromptMate.dto.library.LibraryResponse;
 import com.tave.PromptMate.service.LibraryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -24,15 +29,32 @@ import java.util.List;
 public class LibraryController {
 
     private final LibraryService libraryService;
+    private final S3Uploader s3Uploader;
 
     // 라이브러리에 리라이팅 결과 저장하기
-    @PostMapping
-    @Operation(summary = "리라이팅 결과 저장", description = "리라이팅된 결과를 라이브러리에 저장합니다.")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "리라이팅 결과 저장", description = "리라이팅된 결과를 라이브러리에 저장합니다. 이미지 첨부 가능.")
     public ResponseEntity<LibraryResponse> save(
             @AuthenticationPrincipal CustomUserDetails principal,
-            @Valid @RequestBody CreateLibraryRequest req){
-       Long userId= principal.getUserId();
-       LibraryResponse res=libraryService.save(userId,req);
+            @RequestParam("rewriteResultId") Long rewriteResultId,
+            @RequestParam(value = "savedTitle", required = false) String savedTitle,
+            @RequestParam("platform") Platform platform,
+            @RequestParam("category") PromptCategory category,
+            @RequestPart(value = "image", required = false) MultipartFile image
+    ) throws IOException {
+        Long userId = principal.getUserId();
+
+        // 이미지 업로드
+        String imageUrl = null;
+        if (image != null && !image.isEmpty()) {
+            imageUrl = s3Uploader.uploadImage(image, "library");
+        }
+
+        CreateLibraryRequest req = new CreateLibraryRequest(
+                rewriteResultId, savedTitle, platform, category, imageUrl
+        );
+
+        LibraryResponse res = libraryService.save(userId, req);
 
         return ResponseEntity.created(URI.create("/api/libraries/" + res.id()))
                 .body(res);

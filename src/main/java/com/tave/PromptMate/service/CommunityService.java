@@ -43,8 +43,7 @@ public class CommunityService {
                 req.visibility(),
                 lib.getPlatform(),
                 lib.getCategory(),
-                req.imageUrl()
-
+                lib.getImageUrl()
         );
 
         Community savedCommunity = communityRepository.save(community);

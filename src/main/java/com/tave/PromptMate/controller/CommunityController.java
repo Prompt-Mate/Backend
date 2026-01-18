@@ -1,8 +1,6 @@
 package com.tave.PromptMate.controller;
 
 import com.tave.PromptMate.auth.dto.request.CustomUserDetails;
-import com.tave.PromptMate.common.S3Uploader;
-import com.tave.PromptMate.domain.Community;
 import com.tave.PromptMate.domain.Platform;
 import com.tave.PromptMate.domain.PromptCategory;
 import com.tave.PromptMate.dto.community.*;
@@ -12,13 +10,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -29,31 +24,16 @@ import java.util.List;
 public class CommunityController {
 
     private final CommunityService communityService;
-    private final S3Uploader s3Uploader;
     private final CommunityRecentService communityRecentService;
 
     // 커뮤니티 글 작성
-    @PostMapping(value="/posts", consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "게시글 작성", description = "게시글 작성 입니다.")
+    @PostMapping("/posts")
+    @Operation(summary = "게시글 작성", description = "게시글 작성 입니다. 이미지는 라이브러리 저장 시 첨부됩니다.")
     public ResponseEntity<CommunityPostResponse> createPost(
             @AuthenticationPrincipal CustomUserDetails principal,
-            @RequestParam("rewriteResultId") Long rewriteResultId,
-            @RequestParam("title") String title,
-            @RequestParam("description") String description,
-            @RequestParam("visibility") Community.Visibility visibility,
-            @RequestPart(value="image" ,required = false) MultipartFile image
-            ) throws IOException {
-        Long userId=principal.getUserId();
-
-        // 이미지 업로드
-        String imageUrl = null;
-        if (image != null && !image.isEmpty()) {
-            imageUrl = s3Uploader.uploadImage(image, "community");
-        }
-
-        CreateCommunityPostRequest request = new CreateCommunityPostRequest(
-                rewriteResultId, title, description, visibility,imageUrl
-        );
+            @Valid @RequestBody CreateCommunityPostRequest request
+    ) {
+        Long userId = principal.getUserId();
 
         CommunityPostResponse response = communityService.createPost(request, userId);
 

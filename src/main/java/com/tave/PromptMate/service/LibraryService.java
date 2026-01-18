@@ -55,6 +55,7 @@ public class LibraryService {
                 .savedTitle(req.savedTitle())
                 .platform(req.platform())
                 .category(req.category())
+                .imageUrl(req.imageUrl())
                 .build();
 
         return LibraryMapper.toResponse(libraryRepository.save(library));

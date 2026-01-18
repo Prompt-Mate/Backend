@@ -8,5 +8,6 @@ public record CreateLibraryRequest(
         @NotNull Long rewriteResultId,
         String savedTitle,
         Platform platform,
-        PromptCategory category
+        PromptCategory category,
+        String imageUrl
 ) {}
