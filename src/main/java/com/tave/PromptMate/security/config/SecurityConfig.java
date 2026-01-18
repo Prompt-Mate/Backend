@@ -62,7 +62,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:3000",
                 "http://15.164.131.214:8080",
-                "http://15.164.131.214:3000"    // ← 프론트 배포 주소 (필요시)
+                "https://frontend-three-navy-31.vercel.app"    // ← 프론트 배포 주소 (필요시)
                  ));
         configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
