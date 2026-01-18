@@ -13,5 +13,6 @@ public record LibraryResponse(
         String content,
         Platform platform,
         PromptCategory category,
+        String imageUrl,
         LocalDateTime createdAt
 ) {}

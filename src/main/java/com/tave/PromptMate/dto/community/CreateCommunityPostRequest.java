@@ -16,7 +16,5 @@ public record CreateCommunityPostRequest(
         String description,
 
         @NotNull
-        Visibility visibility,
-
-        String imageUrl
+        Visibility visibility
 ) {}

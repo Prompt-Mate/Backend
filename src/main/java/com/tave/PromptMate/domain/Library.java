@@ -42,6 +42,9 @@ public class Library {
     @Column(nullable = false)
     private PromptCategory category;
 
+    @Column(length = 500)
+    private String imageUrl;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
