@@ -1,6 +1,6 @@
 package com.tave.PromptMate.ai.domain;
 
-import com.tave.PromptMate.domain.Prompt;
+import com.tave.PromptMate.domain.RewriteResult;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +18,10 @@ public class Judge {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rewrite_result_id")
+    private RewriteResult rewriteResult;
 
     @Column
     private Integer overallScore;
@@ -46,6 +50,5 @@ public class Judge {
 
     @Column
     private String originalPrompt;
-
 
 }

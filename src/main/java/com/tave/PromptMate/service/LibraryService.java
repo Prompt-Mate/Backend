@@ -1,5 +1,7 @@
 package com.tave.PromptMate.service;
 
+import com.tave.PromptMate.ai.domain.Judge;
+import com.tave.PromptMate.ai.repository.JudgeRepository;
 import com.tave.PromptMate.common.NotFoundException;
 import com.tave.PromptMate.domain.Community;
 import com.tave.PromptMate.domain.Library;
@@ -8,6 +10,7 @@ import com.tave.PromptMate.domain.User;
 import com.tave.PromptMate.dto.community.CommunityPostMapper;
 import com.tave.PromptMate.dto.community.CommunityPostResponse;
 import com.tave.PromptMate.dto.library.CreateLibraryRequest;
+import com.tave.PromptMate.dto.library.LibraryDetailResponse;
 import com.tave.PromptMate.dto.library.LibraryMapper;
 import com.tave.PromptMate.dto.library.LibraryResponse;
 import com.tave.PromptMate.repository.*;
@@ -31,6 +34,8 @@ public class LibraryService {
     private final RewriteResultRepository rewriteResultRepository;
     private final UserRepository userRepository;
     private final LibraryRepository libraryRepository;
+    private final JudgeRepository judgeRepository;
+
 
     private final CommunityRepository communityRepository;
     private final CommentRepository commentRepository;
@@ -69,12 +74,64 @@ public class LibraryService {
                 .map(LibraryMapper::toResponse);
     }
 
-    // 단건 조회
+    // 라이브러리 목록 상세 페이지 조회
     @Transactional(readOnly = true)
     public LibraryResponse getOne(Long id, Long userId) {
         Library lib = libraryRepository.findByIdAndUser_Id(id, userId)
                 .orElseThrow(() -> new NotFoundException("library not found: " + id));
+
         return LibraryMapper.toResponse(lib);
+    }
+
+    // 라이브러리 상세 페이지 조회 (Judge 평가 포함)
+    @Transactional(readOnly = true)
+    public LibraryDetailResponse getDetail(Long id, Long userId) {
+        Library lib = libraryRepository.findByIdAndUser_Id(id, userId)
+                .orElseThrow(() -> new NotFoundException("library not found: " + id));
+
+        RewriteResult rewriteResult = lib.getRewriteResult();
+
+        // 원본 프롬프트 조회
+        String originalPrompt = null;
+        if (rewriteResult.getPrompt() != null) {
+            originalPrompt = rewriteResult.getPrompt().getContent();
+        }
+
+        // Judge 평가 정보 조회
+        LibraryDetailResponse.JudgeInfo judgeInfo = null;
+        var judgeOpt = judgeRepository.findByRewriteResultId(rewriteResult.getId());
+        if (judgeOpt.isPresent()) {
+            Judge judge = judgeOpt.get();
+            judgeInfo = new LibraryDetailResponse.JudgeInfo(
+                    judge.getId(),
+                    judge.getOverallScore(),
+                    judge.getClarityScore(),
+                    judge.getSpecificityScore(),
+                    judge.getStructureScore(),
+                    judge.getLanguageScore(),
+                    judge.getConsistencyScore(),
+                    judge.getClarityComment(),
+                    judge.getSpecificityComment(),
+                    judge.getStructureComment(),
+                    judge.getLanguageComment(),
+                    judge.getConsistencyComment(),
+                    judge.getSummaryFeedback()
+            );
+        }
+
+        return new LibraryDetailResponse(
+                lib.getId(),
+                lib.getUser().getId(),
+                lib.getSavedTitle(),
+                lib.getPlatform(),
+                lib.getCategory(),
+                lib.getImageUrl(),
+                lib.getCreatedAt(),
+                rewriteResult.getId(),
+                rewriteResult.getContent(),
+                originalPrompt,
+                judgeInfo
+        );
     }
 
     // 삭제하기
