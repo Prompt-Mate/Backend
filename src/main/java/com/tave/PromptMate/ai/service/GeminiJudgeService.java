@@ -2,7 +2,9 @@ package com.tave.PromptMate.ai.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tave.PromptMate.ai.domain.Judge;
 import com.tave.PromptMate.ai.dto.GeminiJudgeResponse;
+import com.tave.PromptMate.ai.repository.JudgeRepository;
 import com.tave.PromptMate.common.UserException;
 import com.tave.PromptMate.domain.User;
 import com.tave.PromptMate.repository.UserRepository;
@@ -24,6 +26,7 @@ public class GeminiJudgeService {
     private final WebClient geminiWebClient;
     private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
+    private final JudgeRepository judgeRepository;
 
     public GeminiJudgeResponse judgePrompt(Long userId, String prompt) {
         User user=getUserById(userId);
@@ -58,7 +61,33 @@ public class GeminiJudgeService {
                     .block();
 
             log.info("Gemini API 응답 - userId: {}", userId);
-            return parseResponse(response);
+
+            log.info("내가 입력한 프롬프트: "+prompt);
+            log.info("응답 결과: "+response);
+
+            GeminiJudgeResponse result = parseResponse(response);
+
+            // Judge 테이블에 저장
+            Judge judge = Judge.builder()
+                    .overallScore(result.getOverall_score())
+                    .clarityScore(result.getClarity_score())
+                    .specificityScore(result.getSpecificity_score())
+                    .structureScore(result.getStructure_score())
+                    .languageScore(result.getLanguage_score())
+                    .consistencyScore(result.getConsistency_score())
+                    .clarityComment(result.getClarity_comment())
+                    .specificityComment(result.getSpecificity_comment())
+                    .structureComment(result.getStructure_comment())
+                    .languageComment(result.getLanguage_comment())
+                    .consistencyComment(result.getConsistency_comment())
+                    .summaryFeedback(result.getSummary_feedback())
+                    .originalPrompt(prompt)
+                    .build();
+
+            judgeRepository.save(judge);
+            log.info("Judge 저장 완료 - id: {}", judge.getId());
+
+            return result;
 
         } catch (Exception e) {
             log.error("Gemini API 호출 실패 - userId: {}", userId, e);
