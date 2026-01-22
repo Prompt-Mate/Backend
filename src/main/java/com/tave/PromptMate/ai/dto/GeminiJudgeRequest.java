@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GeminiJudgeRequest {
 
+    @Schema(description = "리라이팅 결과 ID", example = "1")
+    private Long rewriteResultId;
+
     @Schema(description = "평가할 프롬프트", example = "맛있는 파스타 레시피 알려줘")
     private String prompt;
 

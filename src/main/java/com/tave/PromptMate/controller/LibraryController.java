@@ -6,6 +6,7 @@ import com.tave.PromptMate.domain.Platform;
 import com.tave.PromptMate.domain.PromptCategory;
 import com.tave.PromptMate.dto.community.CommunityPostResponse;
 import com.tave.PromptMate.dto.library.CreateLibraryRequest;
+import com.tave.PromptMate.dto.library.LibraryDetailResponse;
 import com.tave.PromptMate.dto.library.LibraryResponse;
 import com.tave.PromptMate.service.LibraryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -62,7 +63,7 @@ public class LibraryController {
 
     // 내 라이브러리 목록 조회
     @GetMapping("/my")
-    @Operation(summary = "라이브러리 목록 조회", description = "라이브러리 목록을 조회합니다.")
+    @Operation(summary = "저장한 리라이팅 목록 조회", description = "저장한 리라이팅 목록을 조회합니다.")
     public ResponseEntity<Page<LibraryResponse>> myList(
             @AuthenticationPrincipal CustomUserDetails principal,
             @RequestParam(defaultValue = "0") int page,
@@ -72,14 +73,15 @@ public class LibraryController {
         return ResponseEntity.ok(libraryService.getMyLibraries(userId, page, size));
     }
 
-    // 단건 조회
-    @GetMapping("/{id}")
-    public ResponseEntity<LibraryResponse> getOne(
+    // 단건 조회 (상세 페이지 - Judge 평가 포함)
+    @GetMapping("/my/{id}")
+    @Operation(summary = "저장한 리라이팅 상세 페이지 조회", description = "리라이팅 결과의 상세 페이지를 조회합니다. 원본 프롬프트, 리라이팅 결과, 평가 점수/피드백, 카테고리, 플랫폼 정보가 포함됩니다.")
+    public ResponseEntity<LibraryDetailResponse> getDetail(
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails principal) {
 
         Long userId = principal.getUserId();
-        return ResponseEntity.ok(libraryService.getOne(id, userId));
+        return ResponseEntity.ok(libraryService.getDetail(id, userId));
     }
 
     // 삭제

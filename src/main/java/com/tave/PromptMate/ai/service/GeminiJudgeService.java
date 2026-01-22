@@ -5,8 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tave.PromptMate.ai.domain.Judge;
 import com.tave.PromptMate.ai.dto.GeminiJudgeResponse;
 import com.tave.PromptMate.ai.repository.JudgeRepository;
+import com.tave.PromptMate.common.NotFoundException;
 import com.tave.PromptMate.common.UserException;
+import com.tave.PromptMate.domain.RewriteResult;
 import com.tave.PromptMate.domain.User;
+import com.tave.PromptMate.repository.RewriteResultRepository;
 import com.tave.PromptMate.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +30,19 @@ public class GeminiJudgeService {
     private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
     private final JudgeRepository judgeRepository;
+    private final RewriteResultRepository rewriteResultRepository;
 
-    public GeminiJudgeResponse judgePrompt(Long userId, String prompt) {
-        User user=getUserById(userId);
-        String judgePrompt=buildJudgePrompt(prompt);
+    public GeminiJudgeResponse judgePrompt(Long userId, Long rewriteResultId, String prompt) {
+        User user = getUserById(userId);
+
+        // rewriteResultId가 있으면 RewriteResult 조회
+        RewriteResult rewriteResult = null;
+        if (rewriteResultId != null) {
+            rewriteResult = rewriteResultRepository.findById(rewriteResultId)
+                    .orElseThrow(() -> new NotFoundException("rewrite result not found: " + rewriteResultId));
+        }
+
+        String judgePrompt = buildJudgePrompt(prompt);
 
         try {
             Map<String, Object> requestBody = Map.of(
@@ -69,6 +81,7 @@ public class GeminiJudgeService {
 
             // Judge 테이블에 저장
             Judge judge = Judge.builder()
+                    .rewriteResult(rewriteResult)
                     .overallScore(result.getOverall_score())
                     .clarityScore(result.getClarity_score())
                     .specificityScore(result.getSpecificity_score())

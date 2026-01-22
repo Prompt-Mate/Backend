@@ -26,15 +26,17 @@ public class GeminiJudgeController {
     private final GeminiJudgeService geminiJudgeService;
 
     @PostMapping
-    @Operation(summary = "프롬프트 평가/피드백", description = "Gemini api를 통해 리라이팅 되기 전의 프롬프트에 대한 평가와 피드백을 받습니다.")
+    @Operation(summary = "프롬프트 평가/피드백", description = "Gemini api를 통해 리라이팅 되기 전의 프롬프트에 대한 평가와 피드백을 받습니다. rewriteResultId가 있으면 Judge 테이블에 연결하여 저장됩니다.")
     public ResponseEntity<GeminiJudgeResponse> judge(@AuthenticationPrincipal CustomUserDetails principal,
                                                      @RequestBody GeminiJudgeRequest request){
 
-        Long userId= principal.getUserId();
-        GeminiJudgeResponse geminiJudgeResponse=geminiJudgeService.judgePrompt(userId,request.getPrompt());
+        Long userId = principal.getUserId();
+        GeminiJudgeResponse geminiJudgeResponse = geminiJudgeService.judgePrompt(
+                userId,
+                request.getRewriteResultId(),
+                request.getPrompt()
+        );
 
         return ResponseEntity.ok(geminiJudgeResponse);
-
-
     }
 }
